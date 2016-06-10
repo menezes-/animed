@@ -13,8 +13,11 @@
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
 
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
+
+void mouse_callback(GLFWwindow *window, double xpos, double ypos);
+
+void window_resize_callback(GLFWwindow *window, int width, int height);
 
 void doMovement();
 
@@ -39,6 +42,7 @@ static GLFWwindow *setupGraphics(unsigned int screenWidth, unsigned int screenHe
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
+    glfwSetWindowSizeCallback(window, window_resize_callback);
 
     glewExperimental = GL_TRUE;
     GLenum glewError = glewInit();
@@ -140,10 +144,9 @@ void doMovement() {
     if (keys[GLFW_KEY_D])
         camera->move(RIGHT, deltaTime);
 }
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
-    if(firstMouse)
-    {
+
+void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
+    if (firstMouse) {
         lastX = xpos;
         lastY = ypos;
         firstMouse = false;
@@ -160,8 +163,19 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 }
 
 
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     auto camera = static_cast<Camera *>(glfwGetWindowUserPointer(window));
     camera->updateFovOffset(yoffset);
+}
+
+void window_resize_callback(GLFWwindow *window, int width, int height) {
+
+    int nwidth, nheight;
+    glfwGetFramebufferSize(window, &nwidth, &nheight);
+    glViewport(0, 0, nwidth, nheight);
+
+    auto camera = static_cast<Camera *>(glfwGetWindowUserPointer(window));
+
+    camera->setAspect(static_cast<float>(width) / static_cast<float>(height));
+
 }
