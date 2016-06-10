@@ -15,12 +15,84 @@ enum CameraMovement : short {
 class Camera {
 public:
 
+
+    Camera(const glm::vec3 &position);
+
+    glm::mat4 getViewMatrix();
+
+    glm::mat4 getProjectionMatrix();
+
+    void processMouseMovement(GLfloat xoffset, GLfloat yoffset, bool constrainPitch = true);
+
+    void zoom(GLfloat yoffset);
+
+    void move(CameraMovement direction,  GLfloat deltaTime);
+
+    void offsetPosition(const glm::vec3 &offset);
+
+    /**
+     * Retorna a matriz view e projection
+     */
+    glm::mat4 getMatrix();
+
+    GLfloat getYaw() const;
+
+    void setYaw(GLfloat yaw);
+
+    GLfloat getPitch() const;
+
+    void setPitch(GLfloat pitch);
+
+    GLfloat getMovementSpeed() const;
+
+    void setMovementSpeed(GLfloat movementSpeed);
+
+    GLfloat getMouseSensitivity() const;
+
+    void setMouseSensitivity(GLfloat mouseSensitivity);
+
+
+    GLfloat getNearPlane() const;
+
+    void setNearPlane(GLfloat nearPlane);
+
+    GLfloat getFarPlane() const;
+
+    void setFarPlane(GLfloat farPlane);
+
+    GLfloat getAspect() const;
+
+
+    GLfloat getFov() const;
+
+    void setFov(GLfloat fov);
+
+    void setAspect(GLfloat aspect);
+
+    GLfloat getMaxFov() const;
+
+    void setMaxFov(GLfloat maxFov);
+
 private:
+
+
     glm::vec3 position;
     glm::vec3 front;
-    glm::vec3 cameraUp;
+
+    /**
+     * Vetor que aponta para o eixo Y positivo da camera
+     */
+    glm::vec3 up;
+
+    /**
+     * Vetor que representa o eixo X positivo da camera
+     */
     glm::vec3 right;
-    glm::vec3 worldUp;
+
+    /**
+     * Vetor que aponta pra cima no espaço do mundo
+     */
+    const glm::vec3 worldUp;
 
     // Eular Angles
     GLfloat yaw;
@@ -29,6 +101,15 @@ private:
     // Camera options
     GLfloat movementSpeed;
     GLfloat mouseSensitivity;
-    GLfloat zoom;
+
+    // perspectiva
+    GLfloat maxFov;
+    GLfloat fov;
+    GLfloat nearPlane;
+    GLfloat farPlane;
+    GLfloat aspect;
+
+
+    void updateCameraVectors();
 
 };
