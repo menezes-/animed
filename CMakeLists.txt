@@ -84,7 +84,7 @@ set(SOURCE_FILES main.cpp src/Camera.cpp
         src/Mesh.cpp
         include/Mesh.hpp
         src/Model.cpp
-        include/Model.hpp include/utils.hpp include/base64.hpp src/base64.cpp src/Scene.cpp include/Scene.hpp)
+        include/Model.hpp include/utils.hpp include/base64.hpp src/base64.cpp)
 add_executable(animation_editor ${SOURCE_FILES})
 target_link_libraries(animation_editor SOIL2 GLEW glfw ${GLFW_LIBRARIES} assimp)
 
