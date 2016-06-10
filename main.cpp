@@ -40,7 +40,6 @@ static GLFWwindow *setupGraphics(unsigned int screenWidth, unsigned int screenHe
     glfwMakeContextCurrent(window);
 
     glfwSetKeyCallback(window, key_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetWindowSizeCallback(window, window_resize_callback);
 
@@ -83,10 +82,8 @@ int main() {
 
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
-    Camera camera{glm::vec3{0.0f, 0.0f, 3.0f}, 45.0f,
-                  static_cast<float>(width) /
-                  static_cast<float>(height)};
-
+    Camera camera{glm::vec3{0.0f, 3.0f, 4.0f}};
+    camera.setPitch(-30.0f);
     camera.setMaxFov(90.0f);
 
     glfwSetWindowUserPointer(window, &camera);
@@ -134,6 +131,13 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 }
 
 void doMovement() {
+
+    static GLfloat anglez = 0;
+    static GLfloat anglex = 0;
+
+    static GLfloat radius = 10.0f;
+
+
     auto camera = static_cast<Camera *>(glfwGetWindowUserPointer(window));
     if (keys[GLFW_KEY_W])
         camera->move(FORWARD, deltaTime);
@@ -143,6 +147,16 @@ void doMovement() {
         camera->move(LEFT, deltaTime);
     if (keys[GLFW_KEY_D])
         camera->move(RIGHT, deltaTime);
+
+    if (keys[GLFW_KEY_Z]) {
+        GLfloat camx = sin(anglex++) * radius;
+        camera->offsetPosition(glm::vec3(camx, 0.0f, 0.0f));
+    }
+
+    if (keys[GLFW_KEY_X]) {
+        GLfloat camz = cos(anglez++) * radius;
+        camera->offsetPosition(glm::vec3(0.0f, 0.0f, camz));
+    }
 }
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
@@ -159,13 +173,13 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     lastY = ypos;
     auto camera = static_cast<Camera *>(glfwGetWindowUserPointer(window));
 
-    camera->ProcessMouseMovement(xoffset, yoffset);
+    camera->processMouseMovement(xoffset, yoffset);
 }
 
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     auto camera = static_cast<Camera *>(glfwGetWindowUserPointer(window));
-    camera->updateFovOffset(yoffset);
+    camera->zoom(yoffset);
 }
 
 void window_resize_callback(GLFWwindow *window, int width, int height) {
