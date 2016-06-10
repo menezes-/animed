@@ -78,11 +78,11 @@ private:
     const GLfloat DEFAULT_YAW = -90.0f;
     const GLfloat DEFAULT_PITCH = 0.0f;
     const GLfloat DEFAULT_SPEED = 3.0f;
-    const GLfloat DEFAULT_MOUSE_SENSITIVITY = 0.25f; // se refera sensibilidade do mouse
+    const GLfloat DEFAULT_MOUSE_SENSITIVITY = 0.15f; // se refera sensibilidade do mouse
     const GLfloat DEFAULT_FOV = 45.0f;
     const GLfloat DEFAULT_ASPECT = 16.0f / 9.0f;
     const GLfloat DEFAULT_ZNEAR = 0.1f;
-    const GLfloat DEFAULT_ZFAR = 1000.0f;
+    const GLfloat DEFAULT_ZFAR = 100.0f;
     const glm::vec3 DEFAULT_UP_VECTOR = glm::vec3{0, 1, 0};
 
     // valor maximo para o fov:

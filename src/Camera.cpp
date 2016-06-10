@@ -55,14 +55,14 @@ void Camera::setYaw(GLfloat yaw) {
 void Camera::updateViewVectors() {
 
     glm::vec3 frontTmp;
-    front.x = glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
-    front.y = glm::sin(glm::radians(pitch));
-    front.z = glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
+    frontTmp.x = glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
+    frontTmp.y = glm::sin(glm::radians(pitch));
+    frontTmp.z = glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
     front = glm::normalize(frontTmp);
     //normaliza os vetores, pois quanto mais os comprimentos chegam perto de zero mais a camera olha pra cima ou pra baixo deixando o movimento lento
     right = glm::normalize(glm::cross(front,
                                       upVector));
-    upVector = glm::normalize(glm::cross(right, right));
+    upVector = glm::normalize(glm::cross(right, front));
 
 }
 
