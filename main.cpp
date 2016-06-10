@@ -11,6 +11,13 @@
 #include "include/Camera.hpp"
 
 
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+
+void doMovement();
+
 static GLFWwindow *setupGraphics(unsigned int screenWidth, unsigned int screenHeight) {
     if (!glfwInit()) {
         throw std::runtime_error{"Nao foi possivel inicializar a biblioteca GLFW 3"};
@@ -28,6 +35,10 @@ static GLFWwindow *setupGraphics(unsigned int screenWidth, unsigned int screenHe
     }
 
     glfwMakeContextCurrent(window);
+
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     glewExperimental = GL_TRUE;
     GLenum glewError = glewInit();
@@ -57,11 +68,12 @@ bool keys[1024];
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
-
+GLfloat lastX = 400, lastY = 300;
+bool firstMouse = true;
 GLFWwindow *window;
 
 int main() {
-    window = setupGraphics(1024, 1024);
+    window = setupGraphics(800, 600);
 
     TextureLoader textureLoader = TextureLoader();
 
@@ -70,6 +82,8 @@ int main() {
     Camera camera{glm::vec3{0.0f, 0.0f, 3.0f}, 45.0f,
                   static_cast<float>(width) /
                   static_cast<float>(height)};
+
+    camera.setMaxFov(90.0f);
 
     glfwSetWindowUserPointer(window, &camera);
 
@@ -125,4 +139,29 @@ void doMovement() {
         camera->move(LEFT, deltaTime);
     if (keys[GLFW_KEY_D])
         camera->move(RIGHT, deltaTime);
+}
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if(firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    GLfloat xoffset = xpos - lastX;
+    GLfloat yoffset = lastY - ypos;  // Reversed since y-coordinates go from bottom to left
+
+    lastX = xpos;
+    lastY = ypos;
+    auto camera = static_cast<Camera *>(glfwGetWindowUserPointer(window));
+
+    camera->ProcessMouseMovement(xoffset, yoffset);
+}
+
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    auto camera = static_cast<Camera *>(glfwGetWindowUserPointer(window));
+    camera->updateFovOffset(yoffset);
 }
