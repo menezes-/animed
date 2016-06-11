@@ -49,6 +49,12 @@ struct Vertex {
 
     // TexCoords
     glm::vec2 texCoords;
+
+    // Tangent
+    glm::vec3 tangent;
+
+    // Bitangent
+    glm::vec3 bitangent;
 };
 
 class Mesh {
@@ -79,6 +85,7 @@ public:
     Mesh &operator=(Mesh &&) = default;
 
     virtual ~Mesh();
+
 
 private:
     GLuint VAO, VBO, EBO;

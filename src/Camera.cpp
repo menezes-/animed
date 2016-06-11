@@ -91,8 +91,7 @@ GLfloat Camera::getFov() const {
 }
 
 void Camera::setFov(GLfloat fov) {
-    clamp(1.0f, fov, maxFov);
-    this->fov = fov;
+    this->fov = clamp(1.0f, fov, maxFov);
 }
 
 void Camera::processMouseMovement(GLfloat xoffset, GLfloat yoffset, bool constrainPitch) {

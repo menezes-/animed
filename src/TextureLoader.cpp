@@ -20,7 +20,7 @@ GLuint TextureLoader::loadFromPath(const std::string &path) {
     );
 
     if (textId == 0) {
-        std::cerr << "erro ao carregar textura " + path + ". Utilizando textura padrão";
+        std::cerr << "erro ao carregar textura " + path + ". Utilizando textura padrão" << '\n' << SOIL_last_result() << std::endl;
         return defaultTexture;
     }
 

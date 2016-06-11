@@ -19,6 +19,8 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 void window_resize_callback(GLFWwindow *window, int width, int height);
 
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
+
 void doMovement();
 
 static GLFWwindow *setupGraphics(unsigned int screenWidth, unsigned int screenHeight) {
@@ -40,6 +42,8 @@ static GLFWwindow *setupGraphics(unsigned int screenWidth, unsigned int screenHe
     glfwMakeContextCurrent(window);
 
     glfwSetKeyCallback(window, key_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetWindowSizeCallback(window, window_resize_callback);
 
@@ -55,7 +59,7 @@ static GLFWwindow *setupGraphics(unsigned int screenWidth, unsigned int screenHe
     glViewport(0, 0, width, height);
 
     glfwSwapInterval(1);
-    glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     return window;
 
 
@@ -73,6 +77,7 @@ GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 GLfloat lastX = 400, lastY = 300;
 bool firstMouse = true;
+bool mouseLock = true;
 GLFWwindow *window;
 
 int main() {
@@ -90,13 +95,14 @@ int main() {
 
     Shader shader{"nano.vert", "nano.frag"};
 
-    Model modelObj{std::string{"models/nanosuit/nanosuit.obj"}, textureLoader, shader};
-
+    Model modelObj{std::string{"models/hheli/hheli.obj"}, textureLoader, shader};
+    GLfloat rotation = 0;
     while (!glfwWindowShouldClose(window)) {
         // Set frame time
         GLfloat currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+        rotation += (deltaTime / 60) * 360.0f;
 
         // Check and call events
         glfwPollEvents();
@@ -107,9 +113,10 @@ int main() {
         shader.setMatrix4fv("view", glm::value_ptr(camera.getViewMatrix()));
 
         glm::mat4 model;
-        model = glm::translate(model, glm::vec3(0.0f, -1.75f,
-                                                0.0f)); // Translate it down a bit so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));    // It's a bit too big for our scene, so scale it down
+        model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+        model = glm::rotate(model, rotation, glm::vec3(0.0f, 1.0f, 0.0f));
+
         shader.setMatrix4fv("model", glm::value_ptr(model));
         modelObj.draw();
         glfwSwapBuffers(window);
@@ -160,20 +167,22 @@ void doMovement() {
 }
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
-    if (firstMouse) {
+    if (!mouseLock) {
+        if (firstMouse) {
+            lastX = xpos;
+            lastY = ypos;
+            firstMouse = false;
+        }
+
+        GLfloat xoffset = xpos - lastX;
+        GLfloat yoffset = lastY - ypos;  // Reversed since y-coordinates go from bottom to left
+
         lastX = xpos;
         lastY = ypos;
-        firstMouse = false;
+        auto camera = static_cast<Camera *>(glfwGetWindowUserPointer(window));
+
+        camera->processMouseMovement(xoffset, yoffset);
     }
-
-    GLfloat xoffset = xpos - lastX;
-    GLfloat yoffset = lastY - ypos;  // Reversed since y-coordinates go from bottom to left
-
-    lastX = xpos;
-    lastY = ypos;
-    auto camera = static_cast<Camera *>(glfwGetWindowUserPointer(window));
-
-    camera->processMouseMovement(xoffset, yoffset);
 }
 
 
@@ -192,4 +201,10 @@ void window_resize_callback(GLFWwindow *window, int width, int height) {
 
     camera->setAspect(static_cast<float>(width) / static_cast<float>(height));
 
+}
+
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+        mouseLock = !mouseLock;
+    }
 }
