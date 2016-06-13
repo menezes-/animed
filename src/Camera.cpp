@@ -161,7 +161,10 @@ void Camera::move(CameraMovement direction, GLfloat deltaTime) {
 }
 
 
+const glm::vec3 &Camera::getPosition() const {
+    return position;
+}
 
-
-
-
+void Camera::setPosition(const glm::vec3 &position) {
+    Camera::position = position;
+}

@@ -1,4 +1,5 @@
 #include "../include/Mesh.hpp"
+#include <fmt/format.h>
 
 GLuint Mesh::getVAO() const {
     return VAO;
@@ -108,7 +109,7 @@ void Mesh::draw(Shader &shader) const {
 
 
 std::string Texture::getName(GLuint index) {
-    static std::string base = "texture_";
+    static std::string fmt = "material.texture_{0}{1}";
     std::string typeStr;
     switch (type) {
         case DIFFUSE:
@@ -132,5 +133,5 @@ std::string Texture::getName(GLuint index) {
             break;
 
     }
-    return base + typeStr + std::to_string(index);
+    return fmt::format(fmt, typeStr, index);
 }

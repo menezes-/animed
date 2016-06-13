@@ -57,6 +57,10 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/GLFW/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/GLFW/include)
 #======================GLFW=====================
 
+#======================FMTLIB=====================
+add_library(fmt STATIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/fmt/format.cc ${CMAKE_CURRENT_SOURCE_DIR}/lib/fmt/format.h)
+#======================FMTLIB=====================
+
 #======================SOIL2=====================
 # fork da biblioteca SOIL original. Projeto: https://bitbucket.org/SpartanJ/soil2/overview
 add_library(SOIL2 STATIC IMPORTED)
@@ -72,7 +76,6 @@ set_property(TARGET assimp PROPERTY IMPORTED_LOCATION ${ASSIMP_ROOT}/bin/libassi
 
 set_property(TARGET assimp PROPERTY IMPORTED_IMPLIB ${ASSIMP_ROOT}/lib/libassimp.dll.a)
 include_directories(${ASSIMP_ROOT}/include)
-
 #======================ASSIMP=====================
 
 set(SOURCE_FILES main.cpp src/Camera.cpp
@@ -84,8 +87,15 @@ set(SOURCE_FILES main.cpp src/Camera.cpp
         src/Mesh.cpp
         include/Mesh.hpp
         src/Model.cpp
-        include/Model.hpp include/utils.hpp include/base64.hpp src/base64.cpp)
+        include/Model.hpp include/utils.hpp include/base64.hpp src/base64.cpp src/PointLight.cpp include/PointLight.hpp)
 add_executable(animation_editor ${SOURCE_FILES})
-target_link_libraries(animation_editor SOIL2 GLEW glfw ${GLFW_LIBRARIES} assimp)
+
+#======================SHADERS=====================
+#add_custom_command(TARGET animation_editor POST_BUILD
+#        COMMAND ${CMAKE_COMMAND} -E copy_directory
+#        ${CMAKE_SOURCE_DIR}/shaders $<TARGET_FILE_DIR:animation_editor>/shaders)
+#======================SHADERS=====================
+
+target_link_libraries(animation_editor SOIL2 GLEW glfw ${GLFW_LIBRARIES} assimp fmt)
 
 set_target_properties(animation_editor PROPERTIES OUTPUT_NAME "AnimEd-${CMAKE_BUILD_TYPE}")

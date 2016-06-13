@@ -1,6 +1,6 @@
 #include "../include/TextureLoader.hpp"
 #include <SOIL2.h>
-#include <iostream>
+#include <fmt/format.h>
 #include "../include/base64.hpp"
 
 GLuint TextureLoader::loadFromPath(const std::string &path) {
@@ -20,7 +20,7 @@ GLuint TextureLoader::loadFromPath(const std::string &path) {
     );
 
     if (textId == 0) {
-        std::cerr << "erro ao carregar textura " + path + ". Utilizando textura padrão" << '\n' << SOIL_last_result() << std::endl;
+        fmt::print(stderr,"erro ao carregar textura {0}. Utilizando a texture padrão. erro: \n {1} ", path, SOIL_last_result());
         return defaultTexture;
     }
 

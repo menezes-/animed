@@ -9,6 +9,7 @@
 #include "include/Model.hpp"
 #include "include/TextureLoader.hpp"
 #include "include/Camera.hpp"
+#include "include/PointLight.hpp"
 
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
@@ -87,15 +88,28 @@ int main() {
 
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
-    Camera camera{glm::vec3{0.0f, 3.0f, 4.0f}};
-    camera.setPitch(-30.0f);
+    Camera camera{glm::vec3{0.0f, 0.0f, 3.0f}};
+    //camera.setPitch(-30.0f);
     camera.setMaxFov(90.0f);
 
     glfwSetWindowUserPointer(window, &camera);
 
-    Shader shader{"nano.vert", "nano.frag"};
+    Shader shader{"shaders/model.vs.glsl", "shaders/model.fs.glsl"};
+    Lights lights;
+
+    PointLight light1{glm::vec3{-1, 1, 1}};
+    light1.setLightContainer("pointLights");
+    light1.setId(0);
+
+    PointLight light2{glm::vec3{1, -1,1}};
+    light2.setLightContainer("pointLights");
+    light2.setId(1);
+
+    lights.lights.push_back(light1);
+    lights.lights.push_back(light2);
 
     Model modelObj{std::string{"models/hheli/hheli.obj"}, textureLoader, shader};
+
     GLfloat rotation = 0;
     while (!glfwWindowShouldClose(window)) {
         // Set frame time
@@ -111,14 +125,16 @@ int main() {
         shader.enable();
         shader.setMatrix4fv("projection", glm::value_ptr(camera.getProjectionMatrix()));
         shader.setMatrix4fv("view", glm::value_ptr(camera.getViewMatrix()));
+        shader.setUniform3f("viewPos", camera.getPosition());
+        lights.draw(shader);
 
         glm::mat4 model;
         model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
-        model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+        model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
         model = glm::rotate(model, rotation, glm::vec3(0.0f, 1.0f, 0.0f));
-
         shader.setMatrix4fv("model", glm::value_ptr(model));
         modelObj.draw();
+
         glfwSwapBuffers(window);
 
     }
@@ -131,20 +147,15 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
 
-    if (action == GLFW_PRESS)
+    if (action == GLFW_PRESS) {
         keys[key] = true;
-    else if (action == GLFW_RELEASE)
+    }
+    else if (action == GLFW_RELEASE){
         keys[key] = false;
+    }
 }
 
 void doMovement() {
-
-    static GLfloat anglez = 0;
-    static GLfloat anglex = 0;
-
-    static GLfloat radius = 10.0f;
-
-
     auto camera = static_cast<Camera *>(glfwGetWindowUserPointer(window));
     if (keys[GLFW_KEY_W])
         camera->move(FORWARD, deltaTime);
@@ -154,16 +165,6 @@ void doMovement() {
         camera->move(LEFT, deltaTime);
     if (keys[GLFW_KEY_D])
         camera->move(RIGHT, deltaTime);
-
-    if (keys[GLFW_KEY_Z]) {
-        GLfloat camx = sin(anglex++) * radius;
-        camera->offsetPosition(glm::vec3(camx, 0.0f, 0.0f));
-    }
-
-    if (keys[GLFW_KEY_X]) {
-        GLfloat camz = cos(anglez++) * radius;
-        camera->offsetPosition(glm::vec3(0.0f, 0.0f, camz));
-    }
 }
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {

@@ -1,7 +1,7 @@
 #include "../include/Model.hpp"
-#include "../include/utils.hpp"
 #include <assimp/Importer.hpp>
 #include <iostream>
+#include <fmt/format.h>
 
 Model::Model(const std::string &filename, TextureLoader &textureLoader, Shader &shader) : filename(filename),
                                                                                           shader(shader),
@@ -26,10 +26,11 @@ void Model::load() {
     const aiScene *scene = importer.ReadFile(filename,
                                              aiProcess_Triangulate | aiProcess_OptimizeGraph |
                                              aiProcess_OptimizeMeshes | aiProcess_FlipUVs | aiProcess_CalcTangentSpace |
-                                             aiProcess_GenNormals);
+                                             aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices);
 
     if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-        throw std::runtime_error{"ERRO ao carregar o modelo " + filename + ":\n" + importer.GetErrorString()};
+        throw std::runtime_error{
+                fmt::format("ERROR ao carregar o modelo {0} \n: {1}", filename, importer.GetErrorString())};
     }
 
     processNode(scene->mRootNode, scene);
@@ -122,7 +123,6 @@ void Model::makeMesh(aiMesh *mesh, const aiScene *scene) {
 
 std::vector<Texture> Model::loadMaterial(aiMaterial *material, TextureType type) {
     aiTextureType aiType;
-
     switch (type) {
 
         case DIFFUSE:
