@@ -97,11 +97,11 @@ int main() {
     Shader shader{"shaders/model.vs.glsl", "shaders/model.fs.glsl"};
     Lights lights;
 
-    PointLight light1{glm::vec3{-1, 1, 1}};
+    PointLight light1{glm::vec3{1.0f, 0.5f, 1}};
     light1.setLightContainer("pointLights");
     light1.setId(0);
 
-    PointLight light2{glm::vec3{1, -1,1}};
+    PointLight light2{glm::vec3{-3.0f, -3.0f, 0.0f}};
     light2.setLightContainer("pointLights");
     light2.setId(1);
 
@@ -207,5 +207,11 @@ void window_resize_callback(GLFWwindow *window, int width, int height) {
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
         mouseLock = !mouseLock;
+    }
+    if(button == GLFW_MOUSE_BUTTON_LEFT){
+        double x,y;
+        glfwGetCursorPos(window, &x, &y);
+        std::cout << x << ' '<< y<< std::endl;
+
     }
 }

@@ -24,12 +24,3 @@ namespace constants {
     const Attenuation LIGHTING_ATTENUATION{1.0f,0.22f,0.20f};
 
 }
-
-/**
- * Prende o numero entre 'lower' e 'upper'
- * se for menor que lower, vira lower se maior que upper vira upper
- */
-template <typename T>
-T clamp(const T& lower, const T& n, const T& upper) {
-    return std::max(lower, std::min(n, upper));
-}

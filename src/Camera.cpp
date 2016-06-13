@@ -91,7 +91,7 @@ GLfloat Camera::getFov() const {
 }
 
 void Camera::setFov(GLfloat fov) {
-    this->fov = clamp(1.0f, fov, maxFov);
+    this->fov = glm::clamp(fov, 1.0f, maxFov);
 }
 
 void Camera::processMouseMovement(GLfloat xoffset, GLfloat yoffset, bool constrainPitch) {
@@ -104,7 +104,7 @@ void Camera::processMouseMovement(GLfloat xoffset, GLfloat yoffset, bool constra
     pitch += yoffset;
 
     if (constrainPitch) {
-        pitch = clamp(-89.0f, pitch, 89.0f);
+        pitch = glm::clamp(pitch, -89.0f, 89.0f);
     }
 
     updateCameraVectors();
