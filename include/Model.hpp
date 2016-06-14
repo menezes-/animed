@@ -6,23 +6,23 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <vector>
+
 class Model {
 public:
-    Model(const std::string &filename, TextureLoader &textureLoader, Shader &shader);
+    Model(const std::string &filename, TextureLoader &textureLoader);
 
-    void draw();
+    void draw(Shader &shader);
+
 private:
     const std::string filename;
     std::string basePath;
     std::vector<Mesh> meshes;
 
-    Shader& shader;
-
-    TextureLoader& textureLoader;
+    TextureLoader &textureLoader;
 
     void load();
 
-    void processNode(aiNode* node, const aiScene* scene);
+    void processNode(aiNode *node, const aiScene *scene);
 
     void makeMesh(aiMesh *mesh, const aiScene *scene);
 

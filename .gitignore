@@ -1,4 +1,9 @@
 bin/
+!bin/shaders/*.glsl
+lib/GLFW/docs/
+lib/GLFW/examples/
+lib/GLFW/tests/
+lib/GLFW/build/
 
 .idea/
 ### C++ template
@@ -8,24 +13,15 @@ bin/
 *.o
 *.obj
 
+*.a
+*.dll
+!lib/libsoil2.a
+!lib/assimp/bin/libassimp.dll
+!lib/assimp/lib/libassimp.dll.a
+
 # Precompiled Headers
 *.gch
 *.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
 
 # Executables
 *.exe

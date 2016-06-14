@@ -3,9 +3,8 @@
 #include <iostream>
 #include <fmt/format.h>
 
-Model::Model(const std::string &filename, TextureLoader &textureLoader, Shader &shader) : filename(filename),
-                                                                                          shader(shader),
-                                                                                          textureLoader(textureLoader) {
+Model::Model(const std::string &filename, TextureLoader &textureLoader) : filename(filename),
+                                                                          textureLoader(textureLoader) {
     auto found = filename.find_last_of('/');
     basePath = filename.substr(0, found);
     if (basePath.back() != '/') {
@@ -15,7 +14,7 @@ Model::Model(const std::string &filename, TextureLoader &textureLoader, Shader &
     load();
 }
 
-void Model::draw() {
+void Model::draw(Shader &shader) {
     for (const auto &mesh: meshes) {
         mesh.draw(shader);
     }

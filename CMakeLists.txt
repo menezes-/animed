@@ -19,9 +19,10 @@ if (HAS_ASAN_FLAG)
 endif ()
 
 
+set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/)
 
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/)
+include_directories(${LIB_DIR})
 
 
 #======================OPENGL======================
@@ -36,10 +37,10 @@ endif ()
 
 
 #======================GLEW=====================
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/GLEW/include)
+include_directories(${LIB_DIR}/GLEW/include)
 
-add_library(GLEW STATIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/GLEW/src/glew.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/lib/GLEW/include/GL/glew.h)
+add_library(GLEW STATIC ${LIB_DIR}/GLEW/src/glew.c
+        ${LIB_DIR}/GLEW/include/GL/glew.h)
 
 SET_TARGET_PROPERTIES(GLEW PROPERTIES
         COMPILE_FLAGS "-DGLEW_STATIC"
@@ -53,23 +54,23 @@ set(GLFW_BUILD_EXAMPLES NO)
 set(GLFW_BUILD_TESTS NO)
 set(GLFW_BUILD_DOCS NO)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/GLFW/)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/GLFW/include)
+add_subdirectory(${LIB_DIR}/GLFW/)
+include_directories(${LIB_DIR}/GLFW/include)
 #======================GLFW=====================
 
 #======================FMTLIB=====================
-add_library(fmt STATIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/fmt/format.cc ${CMAKE_CURRENT_SOURCE_DIR}/lib/fmt/format.h)
+add_library(fmt STATIC ${LIB_DIR}/fmt/format.cc ${LIB_DIR}fmt/format.h)
 #======================FMTLIB=====================
 
 #======================SOIL2=====================
 # fork da biblioteca SOIL original. Projeto: https://bitbucket.org/SpartanJ/soil2/overview
 add_library(SOIL2 STATIC IMPORTED)
-SET_TARGET_PROPERTIES(SOIL2 PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/lib/libsoil2.a)
+SET_TARGET_PROPERTIES(SOIL2 PROPERTIES IMPORTED_LOCATION ${LIB_DIR}libsoil2.a)
 #======================SOIL2=====================
 
 
 #======================ASSIMP=====================
-set(ASSIMP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/lib/assimp)
+set(ASSIMP_ROOT ${LIB_DIR}/assimp)
 add_library(assimp SHARED IMPORTED)
 
 set_property(TARGET assimp PROPERTY IMPORTED_LOCATION ${ASSIMP_ROOT}/bin/libassimp.dll)
@@ -77,6 +78,29 @@ set_property(TARGET assimp PROPERTY IMPORTED_LOCATION ${ASSIMP_ROOT}/bin/libassi
 set_property(TARGET assimp PROPERTY IMPORTED_IMPLIB ${ASSIMP_ROOT}/lib/libassimp.dll.a)
 include_directories(${ASSIMP_ROOT}/include)
 #======================ASSIMP=====================
+
+
+#======================IMGUI=====================
+set(IMGUI_ROOT ${LIB_DIR}/imgui)
+add_library(imgui
+        STATIC
+        ${IMGUI_ROOT}/imgui.cpp
+        ${IMGUI_ROOT}/imconfig.h
+        ${IMGUI_ROOT}/imgui.h
+        ${IMGUI_ROOT}/imgui_draw.cpp
+        ${IMGUI_ROOT}/imgui_demo.cpp
+        ${IMGUI_ROOT}/imgui_internal.h
+        ${IMGUI_ROOT}/stb_rect_pack.h
+        ${IMGUI_ROOT}/stb_textedit.h
+        ${IMGUI_ROOT}/stb_truetype.h)
+include_directories(${IMGUI_ROOT})
+#======================IMGUI=====================
+
+#======================PTHREADS=====================
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+#======================PTHREADS=====================
+
 
 set(SOURCE_FILES main.cpp src/Camera.cpp
         include/Camera.hpp
@@ -87,7 +111,14 @@ set(SOURCE_FILES main.cpp src/Camera.cpp
         src/Mesh.cpp
         include/Mesh.hpp
         src/Model.cpp
-        include/Model.hpp include/utils.hpp include/base64.hpp src/base64.cpp src/PointLight.cpp include/PointLight.hpp)
+        include/Model.hpp
+        include/utils.hpp
+        include/base64.hpp
+        src/base64.cpp
+        src/PointLight.cpp
+        include/PointLight.hpp
+        ${LIB_DIR}/imgui_impl_glfw_gl3.h
+        ${LIB_DIR}/imgui_impl_glfw_gl3.cpp)
 add_executable(animation_editor ${SOURCE_FILES})
 
 #======================SHADERS=====================
@@ -96,6 +127,6 @@ add_executable(animation_editor ${SOURCE_FILES})
 #        ${CMAKE_SOURCE_DIR}/shaders $<TARGET_FILE_DIR:animation_editor>/shaders)
 #======================SHADERS=====================
 
-target_link_libraries(animation_editor SOIL2 GLEW glfw ${GLFW_LIBRARIES} assimp fmt)
+target_link_libraries(animation_editor SOIL2 GLEW glfw ${GLFW_LIBRARIES} assimp fmt imgui Threads::Threads winmm.lib imm32.lib)
 
 set_target_properties(animation_editor PROPERTIES OUTPUT_NAME "AnimEd-${CMAKE_BUILD_TYPE}")

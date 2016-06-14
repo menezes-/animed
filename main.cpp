@@ -10,6 +10,8 @@
 #include "include/TextureLoader.hpp"
 #include "include/Camera.hpp"
 #include "include/PointLight.hpp"
+#include <imgui.h>
+#include <imgui_impl_glfw_gl3.h>
 
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
@@ -95,7 +97,6 @@ int main() {
     glfwSetWindowUserPointer(window, &camera);
 
     Shader shader{"shaders/model.vs.glsl", "shaders/model.fs.glsl"};
-    Shader lampShader{"shaders/lamp.vs.glsl", "shaders/lamp.fs.glsl"};
 
     Lights lights;
 
@@ -110,39 +111,42 @@ int main() {
     lights.lights.push_back(light1);
     lights.lights.push_back(light2);
 
-    Model modelObj{std::string{"models/nanosuit/nanosuit.obj"}, textureLoader, shader};
-
-    Model lampObj{std::string{"models/nanosuit/nanosuit.obj"}, textureLoader, lampShader};
+    Model modelObj{std::string{"models/nanosuit/nanosuit.obj"}, textureLoader};
 
 
-    auto ini = glm::vec3(0.0f, 0.0f, 0.0f);
-    auto init = glm::vec3(0.0f, -1.75f, 0.0f);
-    auto scale = ini;
-    auto translate = init;
-    GLfloat rotation = 0;
-    auto curr = 1;
+    ImGui_ImplGlfwGL3_Init(window, true);
 
-    auto value = (0.3-0.1)/100.0f;
-    auto valuet = (10-init.x)/100.0f;
+    bool mostrar_ajuda = true;
+
+    glm::vec4 clear_color{0.2f, 0.3f, 0.3f, 1.0f};
+
     while (!glfwWindowShouldClose(window)) {
         // Set frame time
         GLfloat currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        rotation += (deltaTime / 60) * 360.0f;
-
-        if (curr < 100) {
-            scale += value;
-            translate.x +=valuet;
-            curr++;
-
-        } else {
-            curr = 1;
-            scale = ini;
-            translate = init;
-        }
-        // Check and call events
         glfwPollEvents();
+
+
+        ImGui_ImplGlfwGL3_NewFrame();
+        {
+            ImGui::Begin("Ajuda", &mostrar_ajuda);
+            ImGui::ShowUserGuide();
+            ImGui::End();
+        }
+
+        {
+            ImGui::ShowUserGuide();
+            static float f = 0.0f;
+            ImGui::Text("Hello, world!");
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+            ImGui::ColorEdit3("clear color", (float*)&clear_color);
+            //if (ImGui::Button("Test Window")) show_test_window ^= 1;
+            //if (ImGui::Button("Another Window")) show_another_window ^= 1;
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        }
+
+
         doMovement();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.enable();
@@ -150,33 +154,7 @@ int main() {
         shader.setMatrix4fv("view", glm::value_ptr(camera.getViewMatrix()));
         shader.setUniform3f("viewPos", camera.getPosition());
         lights.draw(shader);
-
-        glm::mat4 model;
-        model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// It's a bit too big for our scene, so scale it down
-
-        model = glm::translate(model, translate); // Translate it down a bit so it's at the center of the scene
-
-
-        //model = glm::rotate(model, rotation, glm::vec3(0.0f, 1.0f, 0.0f));
-        shader.setMatrix4fv("model", glm::value_ptr(model));
-        modelObj.draw();
-
-        /*
-        lampShader.enable();
-        lampShader.setMatrix4fv("projection", glm::value_ptr(camera.getProjectionMatrix()));
-        lampShader.setMatrix4fv("view", glm::value_ptr(camera.getViewMatrix()));
-
-        for(auto& light: lights.lights)
-        {
-            model = glm::mat4();
-            model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f)); // Downscale lamp object (a bit too large)
-            model = glm::translate(model,light.getPosition());
-            lampShader.setMatrix4fv("model", glm::value_ptr(model));
-            lampObj.draw();
-        }*/
-
-
-
+        ImGui::Render();
         glfwSwapBuffers(window);
 
     }
