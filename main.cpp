@@ -95,22 +95,35 @@ int main() {
     glfwSetWindowUserPointer(window, &camera);
 
     Shader shader{"shaders/model.vs.glsl", "shaders/model.fs.glsl"};
+    Shader lampShader{"shaders/lamp.vs.glsl", "shaders/lamp.fs.glsl"};
+
     Lights lights;
 
-    PointLight light1{glm::vec3{1.0f, 0.5f, 1}};
+    PointLight light1{glm::vec3{2.3f, 20.0f, 0.0f}};
     light1.setLightContainer("pointLights");
     light1.setId(0);
 
-    PointLight light2{glm::vec3{-3.0f, -3.0f, 0.0f}};
+    PointLight light2{glm::vec3{2.3f, 0.9f, 3.0f}};
     light2.setLightContainer("pointLights");
     light2.setId(1);
 
     lights.lights.push_back(light1);
     lights.lights.push_back(light2);
 
-    Model modelObj{std::string{"models/hheli/hheli.obj"}, textureLoader, shader};
+    Model modelObj{std::string{"models/nanosuit/nanosuit.obj"}, textureLoader, shader};
 
+    Model lampObj{std::string{"models/nanosuit/nanosuit.obj"}, textureLoader, lampShader};
+
+
+    auto ini = glm::vec3(0.0f, 0.0f, 0.0f);
+    auto init = glm::vec3(0.0f, -1.75f, 0.0f);
+    auto scale = ini;
+    auto translate = init;
     GLfloat rotation = 0;
+    auto curr = 1;
+
+    auto value = (0.3-0.1)/100.0f;
+    auto valuet = (10-init.x)/100.0f;
     while (!glfwWindowShouldClose(window)) {
         // Set frame time
         GLfloat currentFrame = glfwGetTime();
@@ -118,6 +131,16 @@ int main() {
         lastFrame = currentFrame;
         rotation += (deltaTime / 60) * 360.0f;
 
+        if (curr < 100) {
+            scale += value;
+            translate.x +=valuet;
+            curr++;
+
+        } else {
+            curr = 1;
+            scale = ini;
+            translate = init;
+        }
         // Check and call events
         glfwPollEvents();
         doMovement();
@@ -129,11 +152,30 @@ int main() {
         lights.draw(shader);
 
         glm::mat4 model;
-        model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
-        model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
-        model = glm::rotate(model, rotation, glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// It's a bit too big for our scene, so scale it down
+
+        model = glm::translate(model, translate); // Translate it down a bit so it's at the center of the scene
+
+
+        //model = glm::rotate(model, rotation, glm::vec3(0.0f, 1.0f, 0.0f));
         shader.setMatrix4fv("model", glm::value_ptr(model));
         modelObj.draw();
+
+        /*
+        lampShader.enable();
+        lampShader.setMatrix4fv("projection", glm::value_ptr(camera.getProjectionMatrix()));
+        lampShader.setMatrix4fv("view", glm::value_ptr(camera.getViewMatrix()));
+
+        for(auto& light: lights.lights)
+        {
+            model = glm::mat4();
+            model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f)); // Downscale lamp object (a bit too large)
+            model = glm::translate(model,light.getPosition());
+            lampShader.setMatrix4fv("model", glm::value_ptr(model));
+            lampObj.draw();
+        }*/
+
+
 
         glfwSwapBuffers(window);
 
@@ -150,7 +192,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     if (action == GLFW_PRESS) {
         keys[key] = true;
     }
-    else if (action == GLFW_RELEASE){
+    else if (action == GLFW_RELEASE) {
         keys[key] = false;
     }
 }
@@ -208,10 +250,10 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
         mouseLock = !mouseLock;
     }
-    if(button == GLFW_MOUSE_BUTTON_LEFT){
-        double x,y;
+    if (button == GLFW_MOUSE_BUTTON_LEFT) {
+        double x, y;
         glfwGetCursorPos(window, &x, &y);
-        std::cout << x << ' '<< y<< std::endl;
+        std::cout << x << ' ' << y << std::endl;
 
     }
 }
