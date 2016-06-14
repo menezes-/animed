@@ -21,6 +21,8 @@ namespace constants {
     const glm::vec3 LIGHTING_DIFFUSE{1.0f, 1.0f, 1.0f};
     const glm::vec3 LIGHTING_SPECULAR{1.0f, 1.0f, 1.0f};
 
+    const int LIGHTING_MAX_LIGHTS = 2;
+
     const Attenuation LIGHTING_ATTENUATION{1.0f,0.22f,0.20f};
 
 }

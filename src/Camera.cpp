@@ -1,5 +1,5 @@
 #include "../include/Camera.hpp"
-#include "../include/utils.hpp"
+#include "../include/Constants.hpp"
 #include <algorithm>
 
 Camera::Camera(const glm::vec3 &position) : position{position}, worldUp{0.0f, 1.0f, 0.0f},

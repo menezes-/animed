@@ -96,9 +96,14 @@ add_library(imgui
 include_directories(${IMGUI_ROOT})
 #======================IMGUI=====================
 
+#======================INI=====================
+add_library(INIH STATIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/ini.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/ini.h)
+#======================INI=====================
+
 #======================PTHREADS=====================
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
+#set(THREADS_PREFER_PTHREAD_FLAG ON)
+#find_package(Threads REQUIRED)
 #======================PTHREADS=====================
 
 
@@ -112,13 +117,13 @@ set(SOURCE_FILES main.cpp src/Camera.cpp
         include/Mesh.hpp
         src/Model.cpp
         include/Model.hpp
-        include/utils.hpp
+        include/Constants.hpp
         include/base64.hpp
         src/base64.cpp
         src/PointLight.cpp
         include/PointLight.hpp
         ${LIB_DIR}/imgui_impl_glfw_gl3.h
-        ${LIB_DIR}/imgui_impl_glfw_gl3.cpp)
+        ${LIB_DIR}/imgui_impl_glfw_gl3.cpp src/Config.cpp include/Config.hpp include/Utils2.hpp src/Utils2.cpp src/GUI.cpp include/GUI.hpp)
 add_executable(animation_editor ${SOURCE_FILES})
 
 #======================SHADERS=====================
@@ -127,6 +132,6 @@ add_executable(animation_editor ${SOURCE_FILES})
 #        ${CMAKE_SOURCE_DIR}/shaders $<TARGET_FILE_DIR:animation_editor>/shaders)
 #======================SHADERS=====================
 
-target_link_libraries(animation_editor SOIL2 GLEW glfw ${GLFW_LIBRARIES} assimp fmt imgui Threads::Threads winmm.lib imm32.lib)
+target_link_libraries(animation_editor SOIL2 GLEW glfw ${GLFW_LIBRARIES} assimp fmt imgui INIH winmm.lib imm32.lib)
 
 set_target_properties(animation_editor PROPERTIES OUTPUT_NAME "AnimEd-${CMAKE_BUILD_TYPE}")

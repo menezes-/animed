@@ -1,6 +1,6 @@
 #include <fmt/format.h>
 #include "../include/PointLight.hpp"
-#include "../include/utils.hpp"
+#include "../include/Constants.hpp"
 
 void Lights::draw(Shader &shader) {
     for (const auto &light:lights) {
