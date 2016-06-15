@@ -145,8 +145,6 @@ std::vector<Texture> Model::loadMaterial(aiMaterial *material, TextureType type)
 
     std::vector<Texture> textures;
 
-    material->
-
     for (std::size_t i = 0; i < material->GetTextureCount(aiType); ++i) {
         aiString path;
         unsigned int ui = static_cast<unsigned int>(i);
