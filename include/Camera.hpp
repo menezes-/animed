@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "Shader.hpp"
 
 
 enum CameraMovement : short {
@@ -18,22 +19,22 @@ public:
 
     Camera(const glm::vec3 &position);
 
-    glm::mat4 getViewMatrix();
+    glm::mat4 getViewMatrix() const;
 
-    glm::mat4 getProjectionMatrix();
+    glm::mat4 getProjectionMatrix() const;
 
     void processMouseMovement(GLfloat xoffset, GLfloat yoffset, bool constrainPitch = true);
 
     void zoom(GLfloat yoffset);
 
-    void move(CameraMovement direction,  GLfloat deltaTime);
+    void move(CameraMovement direction, GLfloat deltaTime);
 
     void offsetPosition(const glm::vec3 &offset);
 
     /**
      * Retorna a matriz view e projection
      */
-    glm::mat4 getMatrix();
+    glm::mat4 getMatrix() const;
 
     GLfloat getYaw() const;
 
@@ -74,9 +75,11 @@ public:
     void setMaxFov(GLfloat maxFov);
 
 
-    const glm::vec3 & getPosition() const;
+    const glm::vec3 &getPosition() const;
 
     void setPosition(const glm::vec3 &position);
+
+    void applyUniforms(Shader &shader) const;
 
 private:
 

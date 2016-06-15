@@ -1,6 +1,7 @@
 #include "../include/Camera.hpp"
 #include "../include/Constants.hpp"
 #include <algorithm>
+#include <glm/gtc/type_ptr.hpp>
 
 Camera::Camera(const glm::vec3 &position) : position{position}, worldUp{0.0f, 1.0f, 0.0f},
                                             movementSpeed{constants::CAMERA_SPEED}, pitch{constants::CAMERA_PITCH},
@@ -114,7 +115,7 @@ void Camera::zoom(GLfloat yoffset) {
     setFov(fov - yoffset);
 }
 
-glm::mat4 Camera::getViewMatrix() {
+glm::mat4 Camera::getViewMatrix() const {
     return glm::lookAt(position, position + front, up);
 }
 
@@ -131,11 +132,11 @@ void Camera::setMaxFov(GLfloat maxFov) {
     this->maxFov = maxFov;
 }
 
-glm::mat4 Camera::getProjectionMatrix() {
+glm::mat4 Camera::getProjectionMatrix() const {
     return glm::perspective(fov, aspect, nearPlane, farPlane);
 }
 
-glm::mat4 Camera::getMatrix() {
+glm::mat4 Camera::getMatrix() const {
     return getProjectionMatrix() * getViewMatrix();
 }
 
@@ -168,3 +169,9 @@ const glm::vec3 &Camera::getPosition() const {
 void Camera::setPosition(const glm::vec3 &position) {
     Camera::position = position;
 }
+
+void Camera::applyUniforms(Shader &shader) const {
+    shader.setMatrix4fv("projection", glm::value_ptr(getProjectionMatrix()));
+    shader.setMatrix4fv("view", glm::value_ptr(getViewMatrix()));
+}
+

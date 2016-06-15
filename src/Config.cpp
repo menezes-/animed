@@ -4,8 +4,6 @@
 #include <fmt/format.h>
 #include <algorithm>
 #include <string>
-#include <imgui.h>
-#include <imgui_impl_glfw_gl3.h>
 
 
 inline glm::vec3 parseVec3(const std::string &value) {
@@ -68,7 +66,7 @@ inline int handler(void *cfg, const char *section, const char *name, const char 
             return 0;
         }
     } else if (startsWith(string_section, "model_")) {
-        std::string modelName = string_section.substr(5, string_section.length());
+        std::string modelName = string_section.substr(6, string_section.length());
 
         ModelConfig &model = config->models[modelName];
 
@@ -83,13 +81,10 @@ inline int handler(void *cfg, const char *section, const char *name, const char 
         }
 
     } else if (startsWith(string_section, "light_")) {
-        std::string lightIndex = string_section.substr(5, string_section.length());
+        std::string lightIndex = string_section.substr(6, string_section.length());
 
         int lii;
         if (toInt(lightIndex, lii)) {
-            if (lii > constants::LIGHTING_MAX_LIGHTS) {
-                return 1;
-            }
             LightConfig &lc = config->lights[lii];
 
             if (string_name == "ambientcolor") {

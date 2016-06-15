@@ -43,6 +43,10 @@ Shader::Shader(const char *vertexPathp, const char *fragmentPathp) : vertexPath{
     glDeleteShader(fragmentShader);
 }
 
+Shader::Shader(const std::string &vertexPath, const std::string &fragmentPath): Shader(vertexPath.c_str(), fragmentPath.c_str()) {
+
+}
+
 GLuint Shader::createShader(GLenum type, const std::string &code) {
 
     const GLchar *code_ptr = code.c_str();

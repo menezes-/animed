@@ -22,6 +22,7 @@ struct Lights {
 };
 
 class PointLight {
+    friend class Scene;
 public:
     PointLight(glm::vec3 position);
 

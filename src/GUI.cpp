@@ -1,6 +1,10 @@
+#define GLEW_STATIC
+
+#include <GL/glew.h>
 #include "../include/GUI.hpp"
 #include <imgui.h>
 #include <imgui_impl_glfw_gl3.h>
+
 
 void GUI::makeGUI() {
 
@@ -33,7 +37,11 @@ void GUI::makeGUI() {
 
     {
         ImGui::Begin("Geral");
-        ImGui::ColorEdit3("Cor de fundo", (float *) &clear_color);
+        if(ImGui::ColorEdit3("Cor de fundo", (float *) &clear_color)){
+            // isso fica aqui para evitar ficar chamando a função clearColor
+            // a cada frame.
+            glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
+        }
         ImGui::End();
     }
 

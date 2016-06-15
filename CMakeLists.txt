@@ -123,7 +123,7 @@ set(SOURCE_FILES main.cpp src/Camera.cpp
         src/PointLight.cpp
         include/PointLight.hpp
         ${LIB_DIR}/imgui_impl_glfw_gl3.h
-        ${LIB_DIR}/imgui_impl_glfw_gl3.cpp src/Config.cpp include/Config.hpp include/Utils.hpp src/Utils.cpp src/GUI.cpp include/GUI.hpp)
+        ${LIB_DIR}/imgui_impl_glfw_gl3.cpp src/Config.cpp include/Config.hpp include/Utils.hpp src/Utils.cpp src/GUI.cpp include/GUI.hpp src/Scene.cpp include/Scene.hpp src/ShaderLoader.cpp include/ShaderLoader.hpp)
 add_executable(animation_editor ${SOURCE_FILES})
 
 #======================SHADERS=====================

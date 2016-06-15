@@ -86,6 +86,8 @@ static GLFWwindow *setupGraphics(const Config &config) {
     glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
 
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
     glfwSwapInterval(1);
     return window;
 
@@ -104,7 +106,8 @@ bool mouseLock = true;
 GLFWwindow *window;
 
 int main() {
-    Config config;
+    Config config = Config::loadConfig("config.ini");
+
     window = setupGraphics(config);
 
     TextureLoader textureLoader = TextureLoader();
@@ -147,7 +150,7 @@ int main() {
         gui.makeGUI();
 
         doMovement();
-        glClearColor(gui.clear_color.r, gui.clear_color.g, gui.clear_color.b, gui.clear_color.a);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.enable();
         shader.setMatrix4fv("projection", glm::value_ptr(camera.getProjectionMatrix()));

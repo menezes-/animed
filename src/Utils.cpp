@@ -31,8 +31,7 @@ bool fileExists(const std::string &string) {
 }
 
 bool startsWith(const std::string &target, const std::string &value) {
-    return target.length() <= value.length()
-           && std::equal(value.begin(), value.end(), target.begin());
+    return  std::equal(value.begin(), value.end(), target.begin());
 }
 
 
