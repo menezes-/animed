@@ -42,6 +42,9 @@ void GUI::makeGUI() {
             // a cada frame.
             glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
         }
+
+        ImGui::Checkbox("Desenhar as luzes", &drawLightsObjects);
+
         ImGui::End();
     }
 

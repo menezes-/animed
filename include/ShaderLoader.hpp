@@ -7,7 +7,7 @@
 class ShaderLoader {
 public:
 
-    ShaderLoader(const std::string& basePath);
+    ShaderLoader(std::string basePath);
 
     Shader& load(const std::string &name);
     Shader& load(const char *name);

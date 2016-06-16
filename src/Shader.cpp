@@ -61,9 +61,24 @@ GLuint Shader::createShader(GLenum type, const std::string &code) {
 
     if (success == GL_FALSE) {
 
+
         std::vector<char> infoLog(100);
-        glGetShaderInfoLog(program, 8096, nullptr, &infoLog[0]);
-        throw std::runtime_error{fmt::format("ERROR compilando o shader: {} ", std::string{&infoLog[0]})};
+        std::vector<char> infoLog2(100);
+
+
+        GLint programivl;
+        GLint shaderivl;
+        glGetProgramiv(id, GL_INFO_LOG_LENGTH, &programivl);
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &shaderivl);
+
+        glGetShaderInfoLog(id, 1000, nullptr, &infoLog[0]);
+        glGetProgramInfoLog(program, programivl, nullptr, &infoLog2[0]);
+        std::string logstr1{infoLog.begin(), infoLog.end()};
+        std::string logstr2{infoLog2.begin(), infoLog2.end()};
+        std::cerr << logstr1 << std::endl;
+        std::cerr << logstr2 << std::endl;
+        glDeleteShader(id);
+        throw std::runtime_error{fmt::format("ERROR compilando o shader: {} ", logstr1)};
 
     }
     return id;

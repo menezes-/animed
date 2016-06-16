@@ -24,7 +24,6 @@ set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/)
 
 include_directories(${LIB_DIR})
 
-
 #======================OPENGL======================
 find_package(OpenGL REQUIRED)
 include_directories(${OpenGL_INCLUDE_DIRS})
@@ -123,7 +122,17 @@ set(SOURCE_FILES main.cpp src/Camera.cpp
         src/PointLight.cpp
         include/PointLight.hpp
         ${LIB_DIR}/imgui_impl_glfw_gl3.h
-        ${LIB_DIR}/imgui_impl_glfw_gl3.cpp src/Config.cpp include/Config.hpp include/Utils.hpp src/Utils.cpp src/GUI.cpp include/GUI.hpp src/Scene.cpp include/Scene.hpp src/ShaderLoader.cpp include/ShaderLoader.hpp)
+        ${LIB_DIR}/imgui_impl_glfw_gl3.cpp
+        src/Config.cpp
+        include/Config.hpp
+        include/Utils.hpp
+        src/Utils.cpp
+        src/GUI.cpp
+        include/GUI.hpp
+        src/Scene.cpp
+        include/Scene.hpp
+        src/ShaderLoader.cpp
+        include/ShaderLoader.hpp src/Transform.cpp include/Transform.hpp)
 add_executable(animation_editor ${SOURCE_FILES})
 
 #======================SHADERS=====================

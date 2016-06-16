@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <string>
 #include "Shader.hpp"
+#include "ShaderLoader.hpp"
 
 
 struct Attenuation {
@@ -44,7 +45,6 @@ public:
 
     void setAttenuation(Attenuation attenuation);
 
-
     int getId() const;
 
     void setId(int id);
@@ -63,6 +63,7 @@ private:
     glm::vec3 specular;
 
     Attenuation attenuation;
+
 
     //representa a posição no array de luzes do shader
     int id;

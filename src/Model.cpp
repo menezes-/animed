@@ -14,6 +14,11 @@ Model::Model(const std::string &filename, TextureLoader &textureLoader) : filena
     load();
 }
 
+Model::Model(const std::string &filename, TextureLoader &textureLoader, const Transform &transform) : Model(filename,
+                                                                                                            textureLoader) {
+    transform.apply(modelMatrix);
+}
+
 void Model::draw(Shader &shader) {
     for (const auto &mesh: meshes) {
         mesh.draw(shader);
@@ -160,7 +165,6 @@ std::vector<Texture> Model::loadMaterial(aiMaterial *material, TextureType type)
 }
 
 
-
-
-
-
+glm::mat4 Model::getModelMatrix() const {
+    return modelMatrix;
+}

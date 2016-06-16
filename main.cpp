@@ -121,7 +121,7 @@ int main() {
 
     glfwSetWindowUserPointer(window, &camera);
 
-    Shader shader{"shaders/model.vs.glsl", "shaders/model.fs.glsl"};
+    Shader shader{"shaders/model_normal_mapping.vs.glsl", "shaders/model_normal_mapping.fs.glsl"};
 
     Lights lights;
 
@@ -136,7 +136,7 @@ int main() {
     lights.lights.push_back(light1);
     lights.lights.push_back(light2);
 
-    Model modelObj{std::string{"models/nanosuit/nanosuit.obj"}, textureLoader};
+    Model modelObj{std::string{"models/cyborg/cyborg.obj"}, textureLoader};
 
     ImGui_ImplGlfwGL3_Init(window, false);
 
@@ -156,13 +156,17 @@ int main() {
         shader.setMatrix4fv("projection", glm::value_ptr(camera.getProjectionMatrix()));
         shader.setMatrix4fv("view", glm::value_ptr(camera.getViewMatrix()));
         shader.setUniform3f("viewPos", camera.getPosition());
+
         lights.draw(shader);
 
         glm::mat4 model;
+        model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+
         model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
-        model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
         //model = glm::rotate(model, rotation, glm::vec3(0.0f, 1.0f, 0.0f));
         shader.setMatrix4fv("model", glm::value_ptr(model));
+
+
         modelObj.draw(shader);
         ImGui::Render();
         glfwSwapBuffers(window);

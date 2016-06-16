@@ -39,7 +39,6 @@ void Mesh::setup() {
     // teoricamente: não daria certo pq offsetof não deveria funcionar com non-POD structs e tipos mais complexos
     // porém o struct é simples e a biblioteca GLM tem a linda propriedade que seus glm::vecN tem um layout compatível com o de um struct
     // ou seja seus membros estão lado a lado, de maneira que isso funciona.
-    // ATENÇÃO: isso tudo é impirico, não encontrei em nenhum lugar  dizendo que o glm::vecN usa esse layout, porém fazer isso funciona.
     //
 
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
@@ -122,7 +121,9 @@ std::string Texture::getName(GLuint index) {
             typeStr = "normal";
             break;
         case HEIGHT:
-            typeStr = "height";
+            // em wavefront files o mapa de normals é definido como height no assimp
+            // todo: confirmar se isso é verdade para outros modelos ou só pro wavefront
+            typeStr = "normal";
             break;
         case AMBIENT:
             typeStr = "ambient";

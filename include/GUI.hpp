@@ -8,6 +8,8 @@ struct GUI {
      */
     bool mostrarControles = true;
 
+    bool drawLightsObjects = false;
+
     /**
      * cor de fundo
      */

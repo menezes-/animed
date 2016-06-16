@@ -2,7 +2,7 @@
 #include <fmt/format.h>
 
 
-ShaderLoader::ShaderLoader(const std::string &basePath) : basePath{basePath} {
+ShaderLoader::ShaderLoader(std::string basePath) : basePath{basePath} {
 
 }
 

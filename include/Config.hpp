@@ -18,7 +18,7 @@ struct LightConfig {
     glm::vec3 diffuseColor{constants::LIGHTING_DIFFUSE};
     glm::vec3 specularColor{constants::LIGHTING_SPECULAR};
 
-    Attenuation attenuation;
+    Attenuation attenuation = constants::LIGHTING_ATTENUATION;
 
 };
 

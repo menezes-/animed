@@ -10,10 +10,12 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <functional>
+#include <memory>
 
 class Scene {
 public:
-    Scene(const Config& config, Camera& camera);
+    Scene(const Config &config, Camera &camera);
 
     void draw();
 
@@ -23,27 +25,34 @@ public:
 
     bool addLight(PointLight light);
 
+    void newModelInstance(const std::string &objectName);
+
+    void newModelInstance(const std::string &objectName, const Transform &transform);
+
+    void setRenderLights(bool renderLights);
+
 private:
-    const Config& config;
-    Camera& camera;
-    std::string lightContainerName{"pointLights"};
+    const Config &config;
+    Camera &camera;
+    ShaderLoader shaderLoader;
+    std::unique_ptr<Model> lampModel;
+
+    bool renderLights{false};
+
 
     TextureLoader textureLoader{};
-
-    ShaderLoader shaderLoader;
+    std::string lightContainerName{"pointLights"};
 
     std::vector<PointLight> lights;
 
-    std::vector<std::pair<Model, Shader&> > models;
+    std::vector<std::pair<Model, std::reference_wrapper<Shader> > > models;
 
     std::size_t maxLights = constants::LIGHTING_MAX_LIGHTS;
 
     bool addLight(const LightConfig &light, int id);
 
-    void loadModels();
-
-    template <class T>
-    void applyUniforms(const T& obj, Shader& shader){
+    template<class T>
+    void applyUniforms(const T &obj, Shader &shader) {
         obj.applyUniforms(shader);
     }
 
