@@ -76,15 +76,8 @@ public:
     // a classe não é copiavel pois ela contém referencias a resources do opengl que são destruidos no destrutor
     // portanto se fosse possível gerar copias do objetos ocorreria um double free dos resources do opengl
     // (dado que cada copia tentaria deletar os seus respectivos VAOs, VBOs e EBOs que apontam para os mesmos recursos no opengl)
-    Mesh &operator=(const Mesh &) = delete;
 
-    Mesh(const Mesh &) = delete;
-
-    Mesh(Mesh &&) = default;
-
-    Mesh &operator=(Mesh &&) = default;
-
-    virtual ~Mesh();
+    //virtual ~Mesh();
 
 
 private:

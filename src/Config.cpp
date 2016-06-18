@@ -75,7 +75,7 @@ inline int handler(void *cfg, const char *section, const char *name, const char 
         } else if (string_name == "shader") {
             model.shader = string_value;
         } else if (string_name == "filename") {
-            model.shader = string_value;
+            model.filename = string_value;
         } else {
             return 0;
         }

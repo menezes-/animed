@@ -66,11 +66,6 @@ void Mesh::setup() {
     glBindVertexArray(0);
 }
 
-Mesh::~Mesh() {
-    ///glDeleteVertexArrays(1, &VAO);
-    //glDeleteBuffers(1, &VBO);
-    //glDeleteBuffers(1, &EBO);
-}
 
 void Mesh::draw(Shader &shader) const {
 

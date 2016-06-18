@@ -19,7 +19,7 @@ Model::Model(const std::string &filename, TextureLoader &textureLoader, const Tr
     transform.apply(modelMatrix);
 }
 
-void Model::draw(Shader &shader) {
+void Model::draw(Shader &shader) const {
     for (const auto &mesh: meshes) {
         mesh.draw(shader);
     }

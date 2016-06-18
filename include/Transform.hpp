@@ -27,6 +27,11 @@ public:
 
     void setTranslate(glm::vec3 translate);
 
+    /**
+     * Aplica as transformações na matrix passada.
+     *
+     * @param [out] modelMatrix matrix contendo as transformações
+     */
     void apply(glm::mat4 &modelMatrix) const;
 
 private:

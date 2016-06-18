@@ -1,6 +1,10 @@
 #pragma once
 
 #include <string>
+#include <cstddef>
+#include <memory>
+#include <type_traits>
+#include <utility>
 
 //tirado de: http://stackoverflow.com/questions/3613284/c-stdstring-to-boolean
 bool toBool(std::string &str);
@@ -9,17 +13,11 @@ bool toInt(const std::string &str, int &value);
 
 bool toFloat(const std::string &str, float &value);
 
-bool fileExists(const std::string &string);
-
 bool startsWith(const std::string &target, const std::string &value);
 
 bool startsWith(const std::string &target, const char *path);
 
-void toLower(std::string& value);
-
-bool dirExists(const char *path);
-
-bool dirExists(const std::string& path);
+void toLower(std::string &value);
 
 template<class ContainerT>
 inline void tokenize(const std::string &str, ContainerT &tokens,

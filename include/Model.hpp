@@ -18,7 +18,7 @@ public:
 
     glm::mat4 getModelMatrix() const;
 
-    void draw(Shader &shader);
+    void draw(Shader &shader) const;
 
 private:
     const std::string filename;

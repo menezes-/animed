@@ -10,7 +10,7 @@ std::string Shader::readFile(const std::string &filename) {
     if (in) {
         return (std::string{(std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>()});
     }
-    throw (strerror(errno));
+    throw std::runtime_error{fmt::format("{} ao tentar ler o arquivo {}",strerror(errno),filename)};
 }
 
 Shader::Shader(const char *vertexPathp, const char *fragmentPathp) : vertexPath{vertexPathp},

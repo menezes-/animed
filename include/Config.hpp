@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <map>
 #include <vector>
@@ -12,7 +13,9 @@ struct ModelConfig {
 };
 
 struct LightConfig {
-    glm::vec3 position;
+    glm::vec3 position{1,1,1};
+
+    glm::vec3 direction{1,1,1};
 
     glm::vec3 ambientColor{constants::LIGHTING_AMBIENT};
     glm::vec3 diffuseColor{constants::LIGHTING_DIFFUSE};
@@ -27,9 +30,9 @@ struct Config {
 
     std::map<int, LightConfig> lights;
 
-    std::string shaderBasePath{"shaders/"};
+    std::string shaderBasePath{"shaders"};
 
-    std::string modelsBasePath{"models/"};
+    std::string modelsBasePath{"models"};
 
     bool multiSamples = false;
     int numberOfSamples = 2;

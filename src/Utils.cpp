@@ -25,11 +25,6 @@ bool toInt(const std::string &str, int &value) {
     }
 }
 
-bool fileExists(const std::string &string) {
-    std::ifstream f(string);
-    return f.good();
-}
-
 bool startsWith(const std::string &target, const std::string &value) {
     return  std::equal(value.begin(), value.end(), target.begin());
 }
@@ -50,18 +45,6 @@ bool toFloat(const std::string &str, float &value) {
 
 void toLower(std::string &value) {
     std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-}
-
-bool dirExists(const char *path) {
-    struct stat info;
-
-    if (stat(path, &info) != 0)
-        return false;
-    else return (info.st_mode & S_IFDIR) != 0;
-}
-
-bool dirExists(const std::string &path) {
-    return dirExists(path.c_str());
 }
 
 

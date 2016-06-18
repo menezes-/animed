@@ -1,5 +1,4 @@
-bin/
-!bin/shaders/*.glsl
+
 lib/GLFW/docs/
 lib/GLFW/examples/
 lib/GLFW/tests/

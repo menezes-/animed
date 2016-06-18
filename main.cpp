@@ -12,6 +12,7 @@
 #include "include/PointLight.hpp"
 #include "include/GUI.hpp"
 #include "include/Config.hpp"
+#include "include/Scene.hpp"
 
 #include <imgui.h>
 #include <imgui_impl_glfw_gl3.h>
@@ -121,23 +122,20 @@ int main() {
 
     glfwSetWindowUserPointer(window, &camera);
 
-    Shader shader{"shaders/model_normal_mapping.vs.glsl", "shaders/model_normal_mapping.fs.glsl"};
+    Scene scene{config, camera};
 
-    Lights lights;
+    LightConfig plc1; // point light 1
+    LightConfig plc2;// point light 2
+    plc1.position = glm::vec3{2.3f, -1.6f, -3.0f};
+    plc2.position = glm::vec3{-1.7f, 0.9f, 1.0f};
 
-    PointLight light1{glm::vec3{2.3f, -1.6f, -3.0f}};
-    light1.setLightContainer("pointLights");
-    light1.setId(0);
+    scene.addLight(LightType::POINT, plc1);
+    scene.addLight(LightType::POINT, plc2);
 
-    PointLight light2{glm::vec3{-1.7f, 0.9f, 1.0f}};
-    light2.setLightContainer("pointLights");
-    light2.setId(1);
-
-    lights.lights.push_back(light1);
-    lights.lights.push_back(light2);
-
-    Model modelObj{std::string{"models/cyborg/cyborg.obj"}, textureLoader};
-
+    Transform transform{};
+    transform.setScale(glm::vec3(0.1f, 0.1f, 0.1f));
+    transform.setTranslate(glm::vec3(0.0f, -1.75f, 0.0f));
+    scene.newModelInstance("cyborg", transform);
     ImGui_ImplGlfwGL3_Init(window, false);
 
     while (!glfwWindowShouldClose(window)) {
@@ -148,26 +146,10 @@ int main() {
         glfwPollEvents();
 
         gui.makeGUI();
-
         doMovement();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shader.enable();
-        shader.setMatrix4fv("projection", glm::value_ptr(camera.getProjectionMatrix()));
-        shader.setMatrix4fv("view", glm::value_ptr(camera.getViewMatrix()));
-        shader.setUniform3f("viewPos", camera.getPosition());
-
-        lights.draw(shader);
-
-        glm::mat4 model;
-        model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
-
-        model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
-        //model = glm::rotate(model, rotation, glm::vec3(0.0f, 1.0f, 0.0f));
-        shader.setMatrix4fv("model", glm::value_ptr(model));
-
-
-        modelObj.draw(shader);
+        scene.draw();
         ImGui::Render();
         glfwSwapBuffers(window);
 

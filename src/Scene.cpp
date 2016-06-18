@@ -1,6 +1,9 @@
 #include <fmt/format.h>
-#include "../include/Scene.hpp"
 #include <glm/gtc/type_ptr.hpp>
+#include "../include/Utils.hpp"
+#include "../include/Scene.hpp"
+#include "../include/SpotLight.hpp"
+#include "../include/PointLight.hpp"
 
 
 Scene::Scene(const Config &config, Camera &camera) : config(config), camera(camera),
@@ -9,7 +12,7 @@ Scene::Scene(const Config &config, Camera &camera) : config(config), camera(came
     camera.setMovementSpeed(config.cameraSpeed);
 
     std::string lampModelPath = fmt::format("{}/{}/{}", config.modelsBasePath, "sphere", "sphere.obj");
-    lampModel = std::unique_ptr<Model>(new Model{lampModelPath, textureLoader});
+    lampModel = std::make_unique<Model>(lampModelPath, textureLoader);
 
 }
 
@@ -28,12 +31,13 @@ void Scene::draw() {
 
         // ... But Tschaikovsky had the news
         // He said LET THERE BE LIGHT....
+
         for (const auto &light: lights) {
-            applyUniforms(light, shader);
+            applyUniforms(*light, shader);
         }
         // .. AND THERE WAS LIGHT
 
-        Model &modelObj = model.first;
+        const Model &modelObj = model.first;
 
         //Matriz de transformação original do modelo
         //todas as transformações deve ser feitas a partir desta matriz
@@ -43,7 +47,7 @@ void Scene::draw() {
 
         modelObj.draw(shader);
 
-        if (renderLights) {
+        if (renderLights && lights.size() > 0) {
 
             Shader &lampShader = shaderLoader.load("lamp");
             lampShader.enable();
@@ -52,7 +56,7 @@ void Scene::draw() {
             for (auto &light: lights) {
                 glm::mat4 lampModel{};
                 lampModel = glm::scale(lampModel, glm::vec3(0.1f, 0.1f, 0.1f));
-                lampModel = glm::translate(lampModel, light.getPosition());
+                lampModel = glm::translate(lampModel, light->getPosition());
                 lampShader.setMatrix4fv("model", glm::value_ptr(lampModel));
                 this->lampModel->draw(lampShader);
             }
@@ -62,32 +66,28 @@ void Scene::draw() {
     }
 }
 
-std::size_t Scene::getMaxLights() const {
-    return maxLights;
-}
 
-void Scene::setMaxLights(std::size_t maxLights) {
-    this->maxLights = maxLights;
-}
+Light *Scene::addLight(LightType type, const LightConfig &lightConfig) {
 
-bool Scene::addLight(PointLight light) {
-    if (lights.size() >= maxLights) {
-        return false;
+    int id = lightsCounter[type]++;
+
+    switch (type) {
+
+        case LightType::SPOT:
+            lights.emplace_back(SpotLight::create(lightConfig.position, lightConfig.direction, id));
+            break;
+        case LightType::POINT:
+            lights.emplace_back(PointLight::create(lightConfig.position, id));
+            break;
     }
+    Light *light = lights.back().get();
+    light->setAmbient(lightConfig.ambientColor);
+    light->setDiffuse(lightConfig.diffuseColor);
+    light->setSpecular(lightConfig.specularColor);
+    light->setAttenuation(lightConfig.attenuation);
 
-    lights.push_back(light);
-    return true;
-}
+    return light;
 
-bool Scene::addLight(const LightConfig &light, int id) {
-    auto pointLight = PointLight{light.position, id, lightContainerName};
-
-    pointLight.setAmbient(light.ambientColor);
-    pointLight.setDiffuse(light.diffuseColor);
-    pointLight.setSpecular(light.specularColor);
-    pointLight.setAttenuation(light.attenuation);
-
-    return addLight(pointLight);
 }
 
 void Scene::newModelInstance(const std::string &objectName) {
@@ -105,11 +105,11 @@ void Scene::newModelInstance(const std::string &objectName, const Transform &tra
 
     Shader &shader = shaderLoader.load(modelConfig.shader);
     std::string filepath = fmt::format("{}/{}/{}", config.modelsBasePath, modelConfig.name, modelConfig.filename);
-    models.emplace_back(std::make_pair(Model{filepath, textureLoader, transform}, std::ref(shader)));
+    auto model = Model{filepath, textureLoader, transform};
+    models.push_back(std::make_pair(model, std::ref(shader)));
 }
 
 
 void Scene::setRenderLights(bool renderLights) {
     this->renderLights = renderLights;
 }
-

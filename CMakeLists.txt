@@ -132,7 +132,13 @@ set(SOURCE_FILES main.cpp src/Camera.cpp
         src/Scene.cpp
         include/Scene.hpp
         src/ShaderLoader.cpp
-        include/ShaderLoader.hpp src/Transform.cpp include/Transform.hpp)
+        include/ShaderLoader.hpp
+        src/Transform.cpp
+        include/Transform.hpp
+        src/Light.cpp
+        include/Light.hpp
+        src/SpotLight.cpp
+        include/SpotLight.hpp)
 add_executable(animation_editor ${SOURCE_FILES})
 
 #======================SHADERS=====================
