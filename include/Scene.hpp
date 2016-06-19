@@ -59,7 +59,9 @@ public:
  */
     Light *addLight(LightType type, const LightConfig &lightConfig);
 
-    void toggleFlashLight(bool onOff);
+    void toggleFlashLight();
+
+    Camera &getCamera() const;
 
 private:
     const Config &config;
@@ -68,6 +70,8 @@ private:
     std::unique_ptr<Model> lampModel;
 
     bool renderLights{false};
+
+    bool renderFlashLight{true};
 
     TextureLoader textureLoader{};
 

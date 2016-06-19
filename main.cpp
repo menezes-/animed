@@ -7,7 +7,6 @@
 
 #include "include/Shader.hpp"
 #include "include/Model.hpp"
-#include "include/TextureLoader.hpp"
 #include "include/Camera.hpp"
 #include "include/PointLight.hpp"
 #include "include/GUI.hpp"
@@ -111,7 +110,6 @@ int main() {
 
     window = setupGraphics(config);
 
-    TextureLoader textureLoader = TextureLoader();
     GUI gui;
 
     int width, height;
@@ -120,10 +118,11 @@ int main() {
     //camera.setPitch(-30.0f);
     camera.setMaxFov(90.0f);
 
-    glfwSetWindowUserPointer(window, &camera);
-
     Scene scene{config, camera};
 
+    glfwSetWindowUserPointer(window, &scene);
+
+    //==============ADICIONA LUZES==============
     LightConfig plc1; // point light 1
     LightConfig plc2;// point light 2
     plc1.position = glm::vec3{2.3f, -1.6f, -3.0f};
@@ -131,11 +130,13 @@ int main() {
 
     scene.addLight(LightType::POINT, plc1);
     scene.addLight(LightType::POINT, plc2);
+    //==============ADICIONA LUZES==============
+
 
     Transform transform{};
     transform.setScale(glm::vec3(0.1f, 0.1f, 0.1f));
     transform.setTranslate(glm::vec3(0.0f, -1.75f, 0.0f));
-    scene.newModelInstance("cyborg", transform);
+    scene.newModelInstance("nanosuit", transform);
     ImGui_ImplGlfwGL3_Init(window, false);
 
     while (!glfwWindowShouldClose(window)) {
@@ -163,9 +164,14 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mode);
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
+    auto scene = static_cast<Scene *>(glfwGetWindowUserPointer(window));
 
     if (action == GLFW_PRESS) {
         keys[key] = true;
+        //todo: remover essa gambiarra
+        if (key == GLFW_KEY_F) {
+            scene->toggleFlashLight();
+        }
     }
     else if (action == GLFW_RELEASE) {
         keys[key] = false;
@@ -173,15 +179,20 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 }
 
 void doMovement() {
-    auto camera = static_cast<Camera *>(glfwGetWindowUserPointer(window));
-    if (keys[GLFW_KEY_W])
-        camera->move(FORWARD, deltaTime);
-    if (keys[GLFW_KEY_S])
-        camera->move(BACKWARD, deltaTime);
-    if (keys[GLFW_KEY_A])
-        camera->move(LEFT, deltaTime);
-    if (keys[GLFW_KEY_D])
-        camera->move(RIGHT, deltaTime);
+    auto scene = static_cast<Scene *>(glfwGetWindowUserPointer(window));
+    auto &camera = scene->getCamera();
+    if (keys[GLFW_KEY_W]) {
+        camera.move(FORWARD, deltaTime);
+    }
+    if (keys[GLFW_KEY_S]) {
+        camera.move(BACKWARD, deltaTime);
+    }
+    if (keys[GLFW_KEY_A]) {
+        camera.move(LEFT, deltaTime);
+    }
+    if (keys[GLFW_KEY_D]) {
+        camera.move(RIGHT, deltaTime);
+    }
 }
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
@@ -197,17 +208,19 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
 
         lastX = xpos;
         lastY = ypos;
-        auto camera = static_cast<Camera *>(glfwGetWindowUserPointer(window));
+        auto scene = static_cast<Scene *>(glfwGetWindowUserPointer(window));
+        auto &camera = scene->getCamera();
 
-        camera->processMouseMovement(xoffset, yoffset);
+        camera.processMouseMovement(xoffset, yoffset);
     }
 }
 
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
-    auto camera = static_cast<Camera *>(glfwGetWindowUserPointer(window));
-    camera->zoom(yoffset);
+    auto scene = static_cast<Scene *>(glfwGetWindowUserPointer(window));
+    auto &camera = scene->getCamera();
+    camera.zoom(yoffset);
 }
 
 void window_resize_callback(GLFWwindow *window, int width, int height) {
@@ -216,9 +229,10 @@ void window_resize_callback(GLFWwindow *window, int width, int height) {
     glfwGetFramebufferSize(window, &nwidth, &nheight);
     glViewport(0, 0, nwidth, nheight);
 
-    auto camera = static_cast<Camera *>(glfwGetWindowUserPointer(window));
+    auto scene = static_cast<Scene *>(glfwGetWindowUserPointer(window));
+    auto &camera = scene->getCamera();
 
-    camera->setAspect(static_cast<float>(width) / static_cast<float>(height));
+    camera.setAspect(static_cast<float>(width) / static_cast<float>(height));
 
 }
 

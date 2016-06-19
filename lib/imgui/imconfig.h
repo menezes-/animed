@@ -32,6 +32,7 @@
 #define IMGUI_STB_NAMESPACE     ImGuiStb
 
 //---- Define constructor and implicit cast operators to convert back<>forth from your math types and ImVec2/ImVec4.
+// converte do glm pro imgui vector class
 #define IM_VEC2_CLASS_EXTRA                                                 \
 ImVec2(const glm::vec2& f) { x = f.x; y = f.y; }                        \
 operator glm::vec2() const { return glm::vec2(x,y); }                   \

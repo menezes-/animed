@@ -118,9 +118,9 @@ void Scene::setRenderLights(bool renderLights) {
     this->renderLights = renderLights;
 }
 
-void Scene::toggleFlashLight(bool onOff) {
-
-    if (onOff) {
+void Scene::toggleFlashLight() {
+    renderFlashLight =  !renderFlashLight;
+    if (renderFlashLight) {
         flashLight->setSpecular(constants::LIGHTING_SPECULAR);
         flashLight->setDiffuse(constants::LIGHTING_DIFFUSE);
         flashLight->setAmbient(constants::LIGHTING_AMBIENT);
@@ -129,4 +129,8 @@ void Scene::toggleFlashLight(bool onOff) {
         flashLight->setDiffuse(glm::vec3{});
         flashLight->setAmbient(glm::vec3{});
     }
+}
+
+Camera &Scene::getCamera() const {
+    return camera;
 }
