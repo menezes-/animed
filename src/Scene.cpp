@@ -1,9 +1,7 @@
+#include "../include/Scene.hpp"
 #include <fmt/format.h>
 #include <glm/gtc/type_ptr.hpp>
 #include "../include/Utils.hpp"
-#include "../include/Scene.hpp"
-#include "../include/SpotLight.hpp"
-#include "../include/PointLight.hpp"
 
 
 Scene::Scene(const Config &config, Camera &camera) : config(config), camera(camera),
@@ -13,10 +11,17 @@ Scene::Scene(const Config &config, Camera &camera) : config(config), camera(came
 
     std::string lampModelPath = fmt::format("{}/{}/{}", config.modelsBasePath, "sphere", "sphere.obj");
     lampModel = std::make_unique<Model>(lampModelPath, textureLoader);
+    LightConfig flashLightConfig{};
+    flashLight = SpotLight::create(flashLightConfig.position, flashLightConfig.direction, 0);
+
 
 }
 
 void Scene::draw() {
+
+
+    flashLight->setPosition(camera.getPosition());
+    flashLight->setDirection(camera.getFront());
 
     for (const auto &model: models) {
         Shader &shader = model.second;
@@ -27,6 +32,7 @@ void Scene::draw() {
         applyUniforms(camera, shader);
 
         //seta o viewPos pras luzes funcionarem direito
+        // viewPos é de viewer position
         shader.setUniform3f("viewPos", camera.getPosition());
 
         // ... But Tschaikovsky had the news
@@ -36,6 +42,7 @@ void Scene::draw() {
             applyUniforms(*light, shader);
         }
         // .. AND THERE WAS LIGHT
+        flashLight->applyUniforms(shader);
 
         const Model &modelObj = model.first;
 
@@ -46,22 +53,19 @@ void Scene::draw() {
         shader.setMatrix4fv("model", glm::value_ptr(modelMatrix));
 
         modelObj.draw(shader);
+    }
+    if (renderLights && lights.size() > 0) {
 
-        if (renderLights && lights.size() > 0) {
+        Shader &lampShader = shaderLoader.load("lamp");
+        lampShader.enable();
 
-            Shader &lampShader = shaderLoader.load("lamp");
-            lampShader.enable();
-
-            applyUniforms(camera, lampShader);
-            for (auto &light: lights) {
-                glm::mat4 lampModel{};
-                lampModel = glm::scale(lampModel, glm::vec3(0.1f, 0.1f, 0.1f));
-                lampModel = glm::translate(lampModel, light->getPosition());
-                lampShader.setMatrix4fv("model", glm::value_ptr(lampModel));
-                this->lampModel->draw(lampShader);
-            }
-
-
+        applyUniforms(camera, lampShader);
+        for (auto &light: lights) {
+            glm::mat4 lampModel{};
+            lampModel = glm::scale(lampModel, glm::vec3(0.1f, 0.1f, 0.1f));
+            lampModel = glm::translate(lampModel, light->getPosition());
+            lampShader.setMatrix4fv("model", glm::value_ptr(lampModel));
+            this->lampModel->draw(lampShader);
         }
     }
 }
@@ -112,4 +116,17 @@ void Scene::newModelInstance(const std::string &objectName, const Transform &tra
 
 void Scene::setRenderLights(bool renderLights) {
     this->renderLights = renderLights;
+}
+
+void Scene::toggleFlashLight(bool onOff) {
+
+    if (onOff) {
+        flashLight->setSpecular(constants::LIGHTING_SPECULAR);
+        flashLight->setDiffuse(constants::LIGHTING_DIFFUSE);
+        flashLight->setAmbient(constants::LIGHTING_AMBIENT);
+    } else {
+        flashLight->setSpecular(glm::vec3{});
+        flashLight->setDiffuse(glm::vec3{});
+        flashLight->setAmbient(glm::vec3{});
+    }
 }

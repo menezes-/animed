@@ -34,6 +34,10 @@ public:
      */
     void setSingleLight(bool singleLight);
 
+    glm::vec3 getDirection() const;
+
+    void setDirection(glm::vec3 direction);
+
 
 protected:
     void initDefaults() override;
@@ -82,7 +86,7 @@ private:
     GLfloat cutOffCosine;
     GLfloat outerCutOffCosine;
 
-    bool singleLight;
+    bool singleLight=true;
 
 };
 

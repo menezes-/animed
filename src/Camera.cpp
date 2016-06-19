@@ -162,7 +162,7 @@ void Camera::move(CameraMovement direction, GLfloat deltaTime) {
 }
 
 
-const glm::vec3 &Camera::getPosition() const {
+glm::vec3 Camera::getPosition() const {
     return position;
 }
 
@@ -173,5 +173,9 @@ void Camera::setPosition(const glm::vec3 &position) {
 void Camera::applyUniforms(Shader &shader) const {
     shader.setMatrix4fv("projection", glm::value_ptr(getProjectionMatrix()));
     shader.setMatrix4fv("view", glm::value_ptr(getViewMatrix()));
+}
+
+glm::vec3 Camera::getFront() const {
+    return front;
 }
 

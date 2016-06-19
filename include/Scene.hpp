@@ -8,6 +8,7 @@
 #include "Model.hpp"
 #include "ShaderLoader.hpp"
 #include "Light.hpp"
+#include "SpotLight.hpp"
 #include <string>
 #include <vector>
 #include <utility>
@@ -58,6 +59,8 @@ public:
  */
     Light *addLight(LightType type, const LightConfig &lightConfig);
 
+    void toggleFlashLight(bool onOff);
+
 private:
     const Config &config;
     Camera &camera;
@@ -67,6 +70,8 @@ private:
     bool renderLights{false};
 
     TextureLoader textureLoader{};
+
+    std::unique_ptr<SpotLight> flashLight;
 
     //mapa que mantém os ids das luzes para cada tipo de luz
     // isso é util para arrays de luzes onde o id corresponde a posição do array no shader
