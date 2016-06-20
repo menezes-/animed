@@ -32,6 +32,13 @@ void Model::load() {
         throw std::runtime_error{
                 fmt::format("ERROR ao carregar o modelo {0} \n: {1}", filename, importer.GetErrorString())};
     }
+    
+    std::vector<Material> materials;
+
+    for (int i = 0; i < scene->mNumMaterials; ++i) {
+        Material material = loadMaterials(scene->mMaterials[i]);
+        materials.push_back(material);
+    }
 
     processNode(scene->mRootNode, scene);
 }
@@ -53,9 +60,7 @@ void Model::makeMesh(aiMesh *mesh, const aiScene *scene) {
 
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
-    std::vector<Texture> textures;
 
-    // Walk through each of the mesh's vertices
     for (std::size_t i = 0; i < mesh->mNumVertices; i++) {
         Vertex vertex;
         glm::vec3 vector;
@@ -112,16 +117,58 @@ void Model::makeMesh(aiMesh *mesh, const aiScene *scene) {
     // ler comentário em Mash.hpp para convenções
     aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 
-    for (std::size_t i = 0; i < TextureType::MAX_TEXTURE_TYPE; ++i) {
-        TextureType ti = static_cast<TextureType>(i);
-        auto tmp = loadMaterial(material, ti);
-        std::copy(tmp.begin(), tmp.end(), std::back_inserter(textures));
-    }
+    Material meshMaterial = loadMaterials(material);
 
-    meshes.emplace_back(vertices, indices, textures);
+    meshes.emplace_back(vertices, indices, meshMaterial);
 }
 
-std::vector<Texture> Model::loadMaterial(aiMaterial *material, TextureType type) {
+
+Material Model::loadMaterials(aiMaterial *amaterial) {
+    //valores default
+    glm::vec3 ka{0.05f, 0.2f, 0.05f};
+    glm::vec3 kd{0.3f, 0.5f, 0.3f};
+    glm::vec3 ks{1.0f, 1.0f, 1.0f};
+    GLfloat shininess = 32.0f;
+
+    aiColor4D color{0.0f, 0.0f, 0.0f, 0.0f};
+    if (AI_SUCCESS == aiGetMaterialColor(amaterial, AI_MATKEY_COLOR_AMBIENT, &color)) {
+        ka = glm::vec3{color.r, color.g, color.b};
+    }
+
+
+    if (AI_SUCCESS == aiGetMaterialColor(amaterial, AI_MATKEY_COLOR_DIFFUSE, &color)) {
+        kd = glm::vec3{color.r, color.g, color.b};
+    }
+
+    if (AI_SUCCESS == aiGetMaterialColor(amaterial, AI_MATKEY_COLOR_SPECULAR, &color)) {
+        ks = glm::vec3{color.r, color.g, color.b};
+    }
+
+    aiString name;
+    amaterial->Get(AI_MATKEY_NAME, name);
+
+    amaterial->Get(AI_MATKEY_SHININESS, shininess);
+
+    if (shininess <= 0.1) {
+        shininess = 32.0f;
+    }
+
+    Material material;
+    material.ambient = ka;
+    material.diffuse = kd;
+    material.specular = ks;
+    material.shininess = shininess;
+
+    for (std::size_t i = 0; i < TextureType::MAX_TEXTURE_TYPE; ++i) {
+        TextureType ti = static_cast<TextureType>(i);
+        auto tmp = loadMaterialTextures(amaterial, ti);
+        std::copy(tmp.begin(), tmp.end(), std::back_inserter(material.textures));
+    }
+
+    return material;
+}
+
+std::vector<Texture> Model::loadMaterialTextures(aiMaterial *material, TextureType type) {
     aiTextureType aiType;
     switch (type) {
 
@@ -151,6 +198,11 @@ std::vector<Texture> Model::loadMaterial(aiMaterial *material, TextureType type)
         unsigned int ui = static_cast<unsigned int>(i);
         material->GetTexture(aiType, ui, &path);
         GLuint textureId = textureLoader.loadFromPath(basePath + std::string{path.C_Str()});
+        // se eu tentar carregar uma textura usada para normal mapping e essa textura não existir
+        // não carrega ela.
+        if ((type == HEIGHT || type == NORMAL) && textureId == textureLoader.getDefaultTexture()) {
+            continue;
+        }
         Texture texture;
         texture.id = textureId;
         texture.type = type;
@@ -159,5 +211,3 @@ std::vector<Texture> Model::loadMaterial(aiMaterial *material, TextureType type)
 
     return textures;
 }
-
-

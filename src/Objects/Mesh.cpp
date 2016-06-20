@@ -5,24 +5,20 @@ GLuint Mesh::getVAO() const {
     return VAO;
 }
 
-Mesh::Mesh(const std::vector<Vertex> &vertices, const std::vector<GLuint> &indices,
-           const std::vector<Texture> &textures)
-        : vertices(vertices), indices(indices), textures(textures) {
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices,
+           Material material)
+        : vertices(vertices), indices(indices), material(material) {
 
     setup();
 
 }
 
-const std::vector<Vertex> &Mesh::getVertices() const {
+std::vector<Vertex> Mesh::getVertices() const {
     return vertices;
 }
 
-const std::vector<GLuint> &Mesh::getIndices() const {
+std::vector<GLuint> Mesh::getIndices() const {
     return indices;
-}
-
-const std::vector<Texture> &Mesh::getTextures() const {
-    return textures;
 }
 
 void Mesh::setup() {
@@ -49,19 +45,19 @@ void Mesh::setup() {
     // Set the vertex attribute pointers
     // Vertex Positions
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *) 0);
     // Vertex Normals
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *) offsetof(Vertex, normal));
     // Vertex Texture Coords
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texCoords));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *) offsetof(Vertex, texCoords));
     // Vertex Tangent
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, tangent));
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *) offsetof(Vertex, tangent));
     // Vertex Bitangent
     glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, bitangent));
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *) offsetof(Vertex, bitangent));
 
     glBindVertexArray(0);
 }
@@ -72,13 +68,19 @@ void Mesh::draw(Shader &shader) const {
     std::array<GLuint, TextureType::MAX_TEXTURE_TYPE> textureIndex{};
     textureIndex.fill(1);
 
-    for (std::size_t i = 0; i < textures.size(); ++i) {
+    // seta as cores do material
 
+    shader.setUniform3f("material.ka", material.ambient);
+    shader.setUniform3f("material.kd", material.diffuse);
+    shader.setUniform3f("material.ks", material.specular);
+    shader.setUniform1f("material.shininess", material.shininess);
+
+    for (std::size_t i = 0; i < material.textures.size(); ++i) {
         GLuint ui = static_cast<GLuint >(i);
         glActiveTexture(GL_TEXTURE0 + ui);
 
         //seta o uniform cujo nome é o padrão para este material com este indice (ver comentário em Mesh.hpp)
-        Texture texture = textures[i];
+        Texture texture = material.textures[i];
         auto uniformName = texture.getName(textureIndex[texture.type]++);
         shader.setUniform1i(uniformName, ui);
 
@@ -86,18 +88,22 @@ void Mesh::draw(Shader &shader) const {
 
     }
 
+
     glBindVertexArray(VAO);
     GLsizei lsizei = static_cast<GLsizei >(indices.size());
     glDrawElements(GL_TRIANGLES, lsizei, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
+
     //como opengl é uma máquina de estados é boa prática deixar tudo como a gente recebeu
-    for (std::size_t i = 0; i < textures.size(); ++i) {
+
+    for (std::size_t i = 0; i < material.textures.size(); ++i) {
 
         GLuint ui = static_cast<GLuint >(i);
         glActiveTexture(GL_TEXTURE0 + ui);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
+
 
 }
 

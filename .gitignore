@@ -10,7 +10,7 @@ lib/GLFW/build/
 *.slo
 *.lo
 *.o
-*.obj
+
 
 *.a
 *.dll

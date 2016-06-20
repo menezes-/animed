@@ -122,7 +122,7 @@ void GUI::makeGUI() {
                             if (ImGui::SmallButton("Editar")) {
                                 if (!editedTransform) {
                                     editedTransform = &instancia.transform;
-                                    tempTransform = *editedTransform;
+                                    tempTransform = Transform{};
                                     previousModelMatrix = instancia.modelMatrix;
                                 }
 
@@ -146,9 +146,9 @@ void GUI::makeGUI() {
         ImGui::Text("Configurações");
         if (editedTransform) {
 
-            glm::vec3 escala = tempTransform.getScale();
-            if (ImGui::DragFloat3("Escala", (float *) &escala, 0.01f, 1.0f, 10.0f)) {
-                tempTransform.setScale(escala);
+            GLfloat escala = tempTransform.getScale().x;
+            if (ImGui::DragFloat("Escala", &escala, 0.01f, .1f, 10.0f)) {
+                tempTransform.setScale(glm::vec3{escala});
                 tempTransform.apply(selectedInstance->modelMatrix);
             }
             ImGui::Separator();
@@ -169,7 +169,7 @@ void GUI::makeGUI() {
             }
             ImGui::Separator();
             glm::vec3 translate = tempTransform.getTranslate();
-            if (ImGui::DragFloat3("Translate", (float *) &translate, 10.0f, 0.0f, 1000.0f)) {
+            if (ImGui::DragFloat3("Translate", (float *) &translate, 1.0f, -1000.0f, 1000.0f)) {
                 tempTransform.setTranslate(translate);
                 tempTransform.apply(selectedInstance->modelMatrix);
             }
@@ -181,7 +181,7 @@ void GUI::makeGUI() {
             }
             ImGui::SameLine();
             if (ImGui::Button("Cancelar")) {
-                tempTransform = *editedTransform;
+                tempTransform = Transform{};
                 selectedInstance->modelMatrix = previousModelMatrix;
             }
         } else {

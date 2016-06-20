@@ -1,6 +1,7 @@
 #pragma once
 
 #define GLEW_STATIC
+
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -40,6 +41,17 @@ struct Texture {
     std::string getName(GLuint index);
 };
 
+struct Material {
+    glm::vec3 ambient{};
+    glm::vec3 diffuse{};
+    glm::vec3 specular{};
+
+    GLfloat shininess;
+
+    std::vector<Texture> textures{};
+};
+
+
 struct Vertex {
     // Position
     glm::vec3 position;
@@ -62,14 +74,12 @@ public:
     GLuint getVAO() const;
 
 
-    Mesh(const std::vector<Vertex> &vertices, const std::vector<GLuint> &indices, const std::vector<Texture> &textures);
+    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, Material material);
 
 
-    const std::vector<Vertex> &getVertices() const;
+    std::vector<Vertex> getVertices() const;
 
-    const std::vector<GLuint> &getIndices() const;
-
-    const std::vector<Texture> &getTextures() const;
+    std::vector<GLuint> getIndices() const;
 
     void draw(Shader &shader) const;
 
@@ -85,7 +95,7 @@ private:
 
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
-    std::vector<Texture> textures;
+   Material material;
 
     void setup();
 

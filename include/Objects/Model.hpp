@@ -27,6 +27,8 @@ private:
 
     void makeMesh(aiMesh *mesh, const aiScene *scene);
 
-    std::vector<Texture> loadMaterial(aiMaterial *material, TextureType type);
+    Material loadMaterials(aiMaterial *amaterial);
+
+    std::vector<Texture> loadMaterialTextures(aiMaterial *material, TextureType type);
 
 };

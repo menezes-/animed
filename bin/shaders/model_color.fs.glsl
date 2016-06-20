@@ -1,9 +1,5 @@
 #version 330 core
 struct Material {
-    sampler2D texture_ambient1;
-    sampler2D texture_diffuse1;
-    sampler2D texture_specular1;
-
     //cores
     vec3 ka;
     vec3 kd;
@@ -86,15 +82,10 @@ vec3 CalcPointLight(PointLight light, Material mat, vec3 normal, vec3 fragPos, v
     float distance = length(light.position - fragPos);
     float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 
-    //combina as cores das luzes com as texturas
-    vec4 ambient_color = texture(mat.texture_ambient1, TexCoords) * vec4(mat.ka, 1.0f);
-    vec4 diffuse_color = texture(mat.texture_diffuse1, TexCoords) * vec4(mat.kd, 1.0f);
-    vec4 specular_color = texture(mat.texture_specular1, TexCoords) *  vec4(mat.ks, 1.0f);
-
     // Combine os resultados
-    vec3 ambient = light.ambient * ambient_color.rgb;
-    vec3 diffuse = light.diffuse * diff * diffuse_color.rgb;
-    vec3 specular = light.specular * spec * specular_color.rgb;
+    vec3 ambient = light.ambient * mat.ka;
+    vec3 diffuse = light.diffuse * diff * mat.kd;
+    vec3 specular = light.specular * spec * mat.ks;
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
@@ -119,16 +110,10 @@ vec3 CalcSpotLight(SpotLight light, Material material, vec3 normal, vec3 fragPos
     float epsilon = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0); // basicamente um if(dentro_do_cone)
 
-    //interpola a textura  com as cores do material
-
-    vec4 ambient_color = texture(material.texture_ambient1, TexCoords) * vec4(material.ka, 1.0f);
-    vec4 diffuse_color = texture(material.texture_diffuse1, TexCoords) * vec4(material.kd, 1.0f);
-    vec4 specular_color = texture(material.texture_specular1, TexCoords) * vec4(material.ks, 1.0f);
-
     // combina os resultados
-    vec3 ambient = light.ambient * ambient_color.rgb;
-    vec3 diffuse = light.diffuse * diff * diffuse_color.rgb;
-    vec3 specular = light.specular * spec * specular_color.rgb;
+    vec3 ambient = light.ambient * material.ka;
+    vec3 diffuse = light.diffuse * diff * material.kd;
+    vec3 specular = light.specular * spec * material.ks;
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;

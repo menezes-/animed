@@ -10,10 +10,9 @@ private:
 
     GLuint defaultTexture;
 
-    const std::string defaultTextureData = std::string{"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAALEgAACxIB0t1+/"
-                                                               "AAAAAd0SU1FB9sEEBQWN66+rGcAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAGHRFWH"
-                                                               "RTb2Z0d2FyZQBwYWludC5uZXQgNC4wLjlsM35OAAAADElEQVQYV2P4b7UZAAQoAe0nEMWTAAAAAElFTkSuQmCC"};
-
+    const std::string defaultTextureData = std::string{"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAAGHRFWHRTb2Z0d2Fy"
+                                                               "ZQBwYWludC5uZXQgNC4wLjlsM35OAAAACklEQVQI12P4BwABAAD/wj7Y"
+                                                               "wAAAAABJRU5ErkJggg=="};
 public:
 
     TextureLoader();
@@ -30,6 +29,8 @@ public:
     GLuint load(const char *path);
 
     GLuint loadFromPath(const std::string &path);
+
+    GLuint getDefaultTexture() const;
 
     virtual ~TextureLoader();
 

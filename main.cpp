@@ -68,7 +68,7 @@ static GLFWwindow *setupGraphics(const Config &config) {
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
-    glfwSetScrollCallback(window, scroll_callback);
+    glfwSetScrollCallback(window, ImGui_ImplGlfwGL3_ScrollCallback);
     glfwSetWindowSizeCallback(window, window_resize_callback);
     glfwSetCharCallback(window, ImGui_ImplGlfwGL3_CharCallback);
 
@@ -174,10 +174,10 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
             auto &scene = gui->scene;
             scene.toggleFlashLight();
         }
-        if(key == GLFW_KEY_F1){
+        if (key == GLFW_KEY_F1) {
             gui->mostrarControles = !gui->mostrarControles;
         }
-        if(key == GLFW_KEY_E){
+        if (key == GLFW_KEY_E) {
             gui->mostrarDebug = !gui->mostrarDebug;
         }
     }
@@ -225,15 +225,6 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     }
 }
 
-
-void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-    ImGui_ImplGlfwGL3_ScrollCallback(window, xoffset, yoffset);
-    auto gui = static_cast<GUI *>(glfwGetWindowUserPointer(window));
-    auto &scene = gui->scene;
-    auto &camera = scene.getCamera();
-    camera.zoom(yoffset);
-}
-
 void window_resize_callback(GLFWwindow *window, int width, int height) {
 
     int nwidth, nheight;
@@ -262,13 +253,12 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
         Scene &scene = gui->scene;
         if (gui->nextInstance) {
             glm::mat4 model = glm::inverse(scene.getCamera().getViewMatrix());
-            model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+            //model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
             model = glm::translate(model, glm::vec3(0, -.7, -5) + scene.getCamera().getFront());
             scene.newModelInstance(*gui->nextInstance, model);
         }
 
         gui->state = GUIState::NORMAL;
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetCursor(window, nullptr);
         gui->nextInstance = nullptr;
     }

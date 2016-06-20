@@ -53,7 +53,6 @@ TextureLoader::~TextureLoader() {
 
 }
 
-
-
-
-
+GLuint TextureLoader::getDefaultTexture() const {
+    return defaultTexture;
+}
