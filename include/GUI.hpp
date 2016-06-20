@@ -1,5 +1,16 @@
 #pragma once
+
 #include <glm/glm.hpp>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include "Scene.hpp"
+
+
+enum class GUIState : short {
+    NORMAL,
+    MODEL_SELECTED
+};
+
 
 struct GUI {
 
@@ -8,12 +19,22 @@ struct GUI {
      */
     bool mostrarControles = true;
 
-    bool drawLightsObjects = false;
+    GUIState state = GUIState::NORMAL;
+
+    Scene &scene;
+
+    GLFWcursor* dragCursor;
+
+    GLFWwindow* window;
+
+    const std::string* nextInstance = nullptr;
 
     /**
      * cor de fundo
      */
     glm::vec4 clear_color{0.2f, 0.3f, 0.3f, 1.0f};
+
+    GUI(Scene &scene, GLFWwindow* window);
 
     /**
      * função chamada a cada interação do loop que monta os controles

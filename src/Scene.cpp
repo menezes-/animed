@@ -4,9 +4,9 @@
 #include "../include/Utils/Utils.hpp"
 
 
-Scene::Scene(const Config &config, Camera &camera, int width, int height) : config(config), camera(camera),
-                                                                            shaderLoader{config.shaderBasePath},
-                                                                            width{width}, height{height} {
+Scene::Scene(Config &config, Camera &camera, int width, int height) : config(config), camera(camera),
+                                                                      shaderLoader{config.shaderBasePath},
+                                                                      width{width}, height{height} {
     camera.setMouseSensitivity(config.mouseSensitivity);
     camera.setMovementSpeed(config.cameraSpeed);
 

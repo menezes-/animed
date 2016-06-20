@@ -62,8 +62,10 @@ template<typename Key, typename T>
 using LightTypeHash = std::unordered_map<Key, T, HashType<Key>>;
 
 class Scene {
+    friend class GUI;
+
 public:
-    Scene(const Config &config, Camera &camera, int width, int height);
+    Scene(Config &config, Camera &camera, int width, int height);
 
     void draw();
 
@@ -93,7 +95,7 @@ public:
     void setHeight(int height);
 
 private:
-    const Config &config;
+    Config &config;
     Camera &camera;
     ShaderLoader shaderLoader;
     int width, height;
