@@ -106,39 +106,39 @@ add_library(INIH STATIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/ini.c
 #======================PTHREADS=====================
 
 
-set(SOURCE_FILES main.cpp src/Camera.cpp
-        include/Camera.hpp
-        include/Shader.hpp
-        src/Shader.cpp
-        include/TextureLoader.hpp
-        src/TextureLoader.cpp
-        src/Mesh.cpp
-        include/Mesh.hpp
-        src/Model.cpp
-        include/Model.hpp
+set(SOURCE_FILES main.cpp src/OpenGL/Camera.cpp
+        include/OpenGL/Camera.hpp
+        include/OpenGL/Shader.hpp
+        src/OpenGL/Shader.cpp
+        include/Loaders/TextureLoader.hpp
+        src/Loaders/TextureLoader.cpp
+        src/Objects/Mesh.cpp
+        include/Objects/Mesh.hpp
+        src/Objects/Model.cpp
+        include/Objects/Model.hpp
         include/Constants.hpp
-        include/base64.hpp
-        src/base64.cpp
-        src/PointLight.cpp
-        include/PointLight.hpp
+        include/Utils/base64.hpp
+        src/Utils/base64.cpp
+        src/Light/PointLight.cpp
+        include/Light/PointLight.hpp
         ${LIB_DIR}/imgui_impl_glfw_gl3.h
         ${LIB_DIR}/imgui_impl_glfw_gl3.cpp
         src/Config.cpp
         include/Config.hpp
-        include/Utils.hpp
-        src/Utils.cpp
+        include/Utils/Utils.hpp
+        src/Utils/Utils.cpp
         src/GUI.cpp
         include/GUI.hpp
         src/Scene.cpp
         include/Scene.hpp
-        src/ShaderLoader.cpp
-        include/ShaderLoader.hpp
+        src/Loaders/ShaderLoader.cpp
+        include/Loaders/ShaderLoader.hpp
         src/Transform.cpp
         include/Transform.hpp
-        src/Light.cpp
-        include/Light.hpp
-        src/SpotLight.cpp
-        include/SpotLight.hpp)
+        src/Light/Light.cpp
+        include/Light/Light.hpp
+        src/Light/SpotLight.cpp
+        include/Light/SpotLight.hpp)
 add_executable(animation_editor ${SOURCE_FILES})
 
 #======================SHADERS=====================

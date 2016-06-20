@@ -1,14 +1,14 @@
 #pragma once
 
 #include "Config.hpp"
-#include "Camera.hpp"
-#include "Shader.hpp"
+#include "OpenGL/Camera.hpp"
+#include "OpenGL/Shader.hpp"
 #include "Constants.hpp"
-#include "TextureLoader.hpp"
-#include "Model.hpp"
-#include "ShaderLoader.hpp"
-#include "Light.hpp"
-#include "SpotLight.hpp"
+#include "Loaders/TextureLoader.hpp"
+#include "Objects/Model.hpp"
+#include "Loaders/ShaderLoader.hpp"
+#include "Light/Light.hpp"
+#include "Light/SpotLight.hpp"
 #include <string>
 #include <vector>
 #include <utility>

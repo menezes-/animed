@@ -2,7 +2,7 @@
 
 #include <GL/glew.h>
 #include <algorithm>
-#include "PointLight.hpp"
+#include "Light/PointLight.hpp"
 
 namespace constants {
     //camera

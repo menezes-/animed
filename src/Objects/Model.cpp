@@ -1,4 +1,4 @@
-#include "../include/Model.hpp"
+#include "../../include/Objects/Model.hpp"
 #include <assimp/Importer.hpp>
 #include <iostream>
 #include <fmt/format.h>

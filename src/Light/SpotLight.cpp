@@ -1,5 +1,5 @@
 #include <fmt/format.h>
-#include "../include/SpotLight.hpp"
+#include "../include/Light/SpotLight.hpp"
 
 
 SpotLight::SpotLight(glm::vec3 position, glm::vec3 direction, int id) : Light(LightType::POINT, position, id),

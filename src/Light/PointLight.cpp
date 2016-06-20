@@ -1,4 +1,4 @@
-#include "../include/PointLight.hpp"
+#include "../include/Light/PointLight.hpp"
 #include "../include/Constants.hpp"
 
 #include <fmt/format.h>

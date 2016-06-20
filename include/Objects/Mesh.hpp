@@ -6,7 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 #include <string>
-#include "Shader.hpp"
+#include "../OpenGL/Shader.hpp"
 
 
 /**

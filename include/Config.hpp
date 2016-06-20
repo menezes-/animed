@@ -3,7 +3,7 @@
 #include <map>
 #include <vector>
 #include <glm/glm.hpp>
-#include "PointLight.hpp"
+#include "Light/PointLight.hpp"
 #include "Constants.hpp"
 
 struct ModelConfig {

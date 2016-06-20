@@ -3,7 +3,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <string>
-#include "Shader.hpp"
+#include "../OpenGL/Shader.hpp"
 
 struct Attenuation {
     GLfloat constant;

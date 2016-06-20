@@ -1,4 +1,4 @@
-#include "../include/Light.hpp"
+#include "../include/Light/Light.hpp"
 #include "../include/Constants.hpp"
 
 Light::Light(LightType type, glm::vec3 position, int id) : type{type}, position{position}, id{id} {

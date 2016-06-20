@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Shader.hpp"
+#include "../OpenGL/Shader.hpp"
 #include "Mesh.hpp"
-#include "TextureLoader.hpp"
-#include "Transform.hpp"
+#include "../Loaders/TextureLoader.hpp"
+#include "../Transform.hpp"
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <vector>

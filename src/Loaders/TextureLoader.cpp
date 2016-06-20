@@ -1,7 +1,7 @@
-#include "../include/TextureLoader.hpp"
+#include "../../include/Loaders/TextureLoader.hpp"
 #include <SOIL2.h>
 #include <fmt/format.h>
-#include "../include/base64.hpp"
+#include "../../include/Utils/base64.hpp"
 
 GLuint TextureLoader::loadFromPath(const std::string &path) {
 

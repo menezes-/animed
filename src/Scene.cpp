@@ -1,7 +1,7 @@
 #include "../include/Scene.hpp"
 #include <fmt/format.h>
 #include <glm/gtc/type_ptr.hpp>
-#include "../include/Utils.hpp"
+#include "../include/Utils/Utils.hpp"
 
 
 Scene::Scene(const Config &config, Camera &camera, int width, int height) : config(config), camera(camera),

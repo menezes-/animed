@@ -1,4 +1,4 @@
-#include "../include/Mesh.hpp"
+#include "../../include/Objects/Mesh.hpp"
 #include <fmt/format.h>
 
 GLuint Mesh::getVAO() const {

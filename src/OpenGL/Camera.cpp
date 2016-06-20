@@ -1,5 +1,5 @@
-#include "../include/Camera.hpp"
-#include "../include/Constants.hpp"
+#include "../../include/OpenGL/Camera.hpp"
+#include "../../include/Constants.hpp"
 #include <algorithm>
 #include <glm/gtc/type_ptr.hpp>
 

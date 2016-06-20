@@ -5,10 +5,10 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "include/Shader.hpp"
-#include "include/Model.hpp"
-#include "include/Camera.hpp"
-#include "include/PointLight.hpp"
+#include "include/OpenGL/Shader.hpp"
+#include "include/Objects/Model.hpp"
+#include "include/OpenGL/Camera.hpp"
+#include "include/Light/PointLight.hpp"
 #include "include/GUI.hpp"
 #include "include/Config.hpp"
 #include "include/Scene.hpp"

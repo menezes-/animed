@@ -1,4 +1,4 @@
-#include "../include/Shader.hpp"
+#include "../../include/OpenGL/Shader.hpp"
 #include <fstream>
 #include <iostream>
 #include <cstring>

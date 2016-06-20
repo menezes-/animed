@@ -2,7 +2,7 @@
 
 #include <string>
 #include <unordered_map>
-#include "Shader.hpp"
+#include "../OpenGL/Shader.hpp"
 
 class ShaderLoader {
 public:

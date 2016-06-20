@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <memory>
-#include "Shader.hpp"
+#include "../OpenGL/Shader.hpp"
 #include "Light.hpp"
 
 class PointLight final : public Light {
