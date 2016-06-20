@@ -2,9 +2,12 @@
 
 #include <GL/glew.h>
 #include "../include/GUI.hpp"
-#include "../include/Scene.hpp"
+#include "../include/Transform.hpp"
+#include "../include/Utils/Utils.hpp"
 #include <imgui.h>
 #include <imgui_impl_glfw_gl3.h>
+#include <fmt/format.h>
+#include <glm/gtx/string_cast.hpp>
 
 
 inline void showHelpMarker(const char *desc) {
@@ -56,6 +59,9 @@ void GUI::makeGUI() {
 
     {
         static bool showGeral = true;
+        static Transform *editedTransform = nullptr;
+        static Transform tempTransform = Transform{};
+        static glm::mat4 previousModelMatrix{};
         ImGui::Begin("Geral", &showGeral, glm::vec2{800, 650}, -1.0f);
 
         ImGui::BeginChild("models", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 300), false,
@@ -81,6 +87,40 @@ void GUI::makeGUI() {
                 }
                 ImGui::TreePop();
             }
+
+            if (!scene.models.empty()) {
+                if (ImGui::TreeNode("Instâncias")) {
+                    static ImGuiTextFilter filterInstances;
+                    filterInstances.Draw("Filtrar");
+                    int counter = 0;
+                    for (auto &instancia: scene.models) {
+                        if (!filterInstances.PassFilter(instancia.objectName.c_str())) continue;
+                        ImColor color = instancia.show ? ImColor{0, 255, 0} : ImColor{255, 0, 0};
+                        ImGui::PushStyleColor(ImGuiCol_Text, color);
+                        if (ImGui::TreeNode(fmt::format("{} {}", instancia.objectName, ++counter).c_str())) {
+                            selectedInstance = &instancia;
+                            ImGui::PushStyleColor(ImGuiCol_Text, ImColor{255, 255, 255});
+                            const char *label = instancia.show ? "Esconder" : "Exibir";
+                            if (ImGui::SmallButton(label)) {
+                                instancia.show = !instancia.show;
+                            }
+                            ImGui::SameLine();
+                            if (ImGui::SmallButton("Editar")) {
+                                if (!editedTransform) {
+                                    editedTransform = &instancia.transform;
+                                    tempTransform = *editedTransform;
+                                    previousModelMatrix = instancia.modelMatrix;
+                                }
+
+                            }
+                            ImGui::TreePop();
+                            ImGui::PopStyleColor();
+                        }
+                        ImGui::PopStyleColor(1);
+                    }
+                    ImGui::TreePop();
+                }
+            }
         }
 
         ImGui::EndChild();
@@ -90,26 +130,82 @@ void GUI::makeGUI() {
         ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
         ImGui::BeginChild("config", ImVec2(0, 300), true);
         ImGui::Text("Configurações");
-        if (ImGui::ColorEdit3("Cor de fundo", (float *) &clear_color)) {
-            // isso fica aqui para evitar ficar chamando a função clearColor
-            // a cada frame.
-            glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
-        }
+        if (editedTransform) {
 
-        ImGui::Checkbox("Desenhar as luzes", &scene.renderLights);
-        if (ImGui::Checkbox("Anti Aliasing", &scene.config.multiSamples)) {
-            if (scene.config.multiSamples) {
-                glEnable(GL_MULTISAMPLE);
-            } else {
-                glDisable(GL_MULTISAMPLE);
+            glm::vec3 escala = tempTransform.getScale();
+            if (ImGui::DragFloat3("Escala", (float *) &escala, 0.01f, 1.0f, 10.0f)) {
+                tempTransform.setScale(escala);
+                tempTransform.apply(selectedInstance->modelMatrix);
+            }
+            ImGui::Separator();
+            GLfloat RX = tempTransform.getRotation(Axis::X);
+            GLfloat RY = tempTransform.getRotation(Axis::Y);
+            GLfloat RZ = tempTransform.getRotation(Axis::Z);
+            if (ImGui::SliderAngle("Rotção e. X", &RX)) {
+                tempTransform.setRotation(RX, Axis::X);
+                tempTransform.apply(selectedInstance->modelMatrix);
+            }
+            if (ImGui::SliderAngle("Rotção e. Y", &RY)) {
+                tempTransform.setRotation(RY, Axis::Y);
+                tempTransform.apply(selectedInstance->modelMatrix);
+            }
+            if (ImGui::SliderAngle("Rotção e. Z", &RZ)) {
+                tempTransform.setRotation(RZ, Axis::Z);
+                tempTransform.apply(selectedInstance->modelMatrix);
+            }
+            ImGui::Separator();
+            glm::vec3 translate = tempTransform.getTranslate();
+            if (ImGui::DragFloat3("Translate", (float *) &translate, 10.0f, 0.0f, 1000.0f)) {
+                tempTransform.setTranslate(translate);
+                tempTransform.apply(selectedInstance->modelMatrix);
+            }
+            if (ImGui::Button("Aplicar", ImVec2(120, 0))) {
+
+                *editedTransform = tempTransform;
+                editedTransform = nullptr;
+                tempTransform = Transform{};
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancelar")) {
+                tempTransform = *editedTransform;
+                selectedInstance->modelMatrix = previousModelMatrix;
+            }
+        } else {
+            if (ImGui::ColorEdit3("Cor de fundo", (float *) &clear_color)) {
+                // isso fica aqui para evitar ficar chamando a função clearColor
+                // a cada frame.
+                glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
+            }
+
+            ImGui::Checkbox("Desenhar as luzes", &scene.renderLights);
+            if (ImGui::Checkbox("Anti Aliasing", &scene.config.multiSamples)) {
+                if (scene.config.multiSamples) {
+                    glEnable(GL_MULTISAMPLE);
+                } else {
+                    glDisable(GL_MULTISAMPLE);
+                }
             }
         }
-
         ImGui::EndChild();
         ImGui::PopStyleVar();
+        ImGui::End();
+    }
 
+    {
+        ImGui::Begin("Debug", &mostrarDebug, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::Text("Framerate %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        if (ImGui::CollapsingHeader("Câmera")) {
+            ImGui::BulletText(fmt::format("Posição: {}", glm::to_string(scene.getCamera().getPosition())).c_str());
+            ImGui::BulletText(fmt::format("Front: {}", glm::to_string(scene.getCamera().getFront())).c_str());
+            ImGui::BulletText(fmt::format("FOV: {}º", scene.getCamera().getFov()).c_str());
+            ImGui::BulletText(fmt::format("Max FOV: {}º", scene.getCamera().getMaxFov()).c_str());
+            ImGui::BulletText(fmt::format("Yaw: {}º", scene.getCamera().getYaw()).c_str());
+            ImGui::BulletText(fmt::format("Pitch: {}º", scene.getCamera().getPitch()).c_str());
+            ImGui::BulletText(fmt::format("Aspect: {}", scene.getCamera().getAspect()).c_str());
+            ImGui::BulletText(fmt::format("Near Plane: {}", scene.getCamera().getNearPlane()).c_str());
+            ImGui::BulletText(fmt::format("Far Plane: {}", scene.getCamera().getFarPlane()).c_str());
 
+        }
         ImGui::End();
     }
 

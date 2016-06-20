@@ -29,12 +29,20 @@ struct ModelInstance {
     std::reference_wrapper<Model> model;
     std::reference_wrapper<Shader> shader;
     glm::mat4 modelMatrix{};
+    std::string objectName;
     std::vector<Transform> keyFrames{};
+
+    /**
+     * O objeto transform abaixo serve como um placeholder para guardar modificações
+     * feitas através da interface de usuário no modelMatrix do objeto.
+     */
+
+    Transform transform{};
 
     bool show = true;
 
     ModelInstance(const std::reference_wrapper<Model> &model, const std::reference_wrapper<Shader> &shader,
-                  const glm::mat4 &modelMatrix);
+                  const glm::mat4 &modelMatrix, std::string objectName);
 
 };
 

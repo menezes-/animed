@@ -50,7 +50,6 @@ void Scene::draw() {
         flashLight->applyUniforms(shader);
 
         shader.setMatrix4fv("model", glm::value_ptr(model.modelMatrix));
-
         model.model.get().draw(shader);
     }
     if (renderLights && lights.size() > 0) {
@@ -105,7 +104,7 @@ void Scene::newModelInstance(const std::string &objectName, glm::mat4 modelMatri
         auto &pair = mof->second;
         Shader &shader = pair.second;
         Model &model = pair.first;
-        ModelInstance instance{std::ref(model), std::ref(shader), modelMatrix};
+        ModelInstance instance{std::ref(model), std::ref(shader), modelMatrix, objectName};
         models.push_back(instance);
     }
 
@@ -159,4 +158,4 @@ void Scene::preLoadModels() {
 }
 
 ModelInstance::ModelInstance(const std::reference_wrapper<Model> &model, const std::reference_wrapper<Shader> &shader,
-                             const glm::mat4 &modelMatrix) : model(model), shader(shader), modelMatrix(modelMatrix) {}
+                             const glm::mat4 &modelMatrix, std::string objectName) : model(model), shader(shader), modelMatrix(modelMatrix), objectName{objectName} {}

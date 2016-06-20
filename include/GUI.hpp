@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <memory>
 #include "Scene.hpp"
 
 
@@ -19,22 +20,26 @@ struct GUI {
      */
     bool mostrarControles = true;
 
+    bool mostrarDebug = true;
+
     GUIState state = GUIState::NORMAL;
 
     Scene &scene;
 
-    GLFWcursor* dragCursor;
+    GLFWcursor *dragCursor;
 
-    GLFWwindow* window;
+    GLFWwindow *window;
 
-    const std::string* nextInstance = nullptr;
+    ModelInstance* selectedInstance = nullptr;
+
+    const std::string *nextInstance = nullptr;
 
     /**
      * cor de fundo
      */
     glm::vec4 clear_color{0.2f, 0.3f, 0.3f, 1.0f};
 
-    GUI(Scene &scene, GLFWwindow* window);
+    GUI(Scene &scene, GLFWwindow *window);
 
     /**
      * função chamada a cada interação do loop que monta os controles

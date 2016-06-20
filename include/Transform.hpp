@@ -33,13 +33,14 @@ public:
      * @param [out] modelMatrix matrix contendo as transformações
      */
     void apply(glm::mat4 &modelMatrix) const;
+    void apply(glm::mat4 *modelMatrix) const;
 
 private:
     GLfloat RX;
     GLfloat RY;
     GLfloat RZ;
 
-    glm::vec3 scale;
+    glm::vec3 scale{1.0f};
 
     glm::vec3 translate;
 
