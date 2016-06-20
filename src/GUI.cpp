@@ -16,6 +16,20 @@ inline void showHelpMarker(const char *desc) {
         ImGui::SetTooltip(desc);
 }
 
+inline std::string matToText(const glm::mat4 &matrix) {
+
+    std::string result{};
+
+    for (int i = 0; i < 4; ++i) {
+        std::string row{""};
+        for (int j = 0; j < 4; ++j) {
+            row += fmt::format("{: f} ", matrix[i][j]);
+        }
+        result += row + std::string{"\n"};
+    }
+    return result;
+}
+
 
 void GUI::makeGUI() {
 
@@ -192,21 +206,30 @@ void GUI::makeGUI() {
     }
 
     {
-        ImGui::Begin("Debug", &mostrarDebug, ImGuiWindowFlags_AlwaysAutoResize);
-        ImGui::Text("Framerate %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        if (ImGui::CollapsingHeader("Câmera")) {
-            ImGui::BulletText(fmt::format("Posição: {}", glm::to_string(scene.getCamera().getPosition())).c_str());
-            ImGui::BulletText(fmt::format("Front: {}", glm::to_string(scene.getCamera().getFront())).c_str());
-            ImGui::BulletText(fmt::format("FOV: {}º", scene.getCamera().getFov()).c_str());
-            ImGui::BulletText(fmt::format("Max FOV: {}º", scene.getCamera().getMaxFov()).c_str());
-            ImGui::BulletText(fmt::format("Yaw: {}º", scene.getCamera().getYaw()).c_str());
-            ImGui::BulletText(fmt::format("Pitch: {}º", scene.getCamera().getPitch()).c_str());
-            ImGui::BulletText(fmt::format("Aspect: {}", scene.getCamera().getAspect()).c_str());
-            ImGui::BulletText(fmt::format("Near Plane: {}", scene.getCamera().getNearPlane()).c_str());
-            ImGui::BulletText(fmt::format("Far Plane: {}", scene.getCamera().getFarPlane()).c_str());
+        if (mostrarDebug) {
+            ImGui::Begin("Debug", &mostrarDebug, ImGuiWindowFlags_AlwaysAutoResize);
+            ImGui::Text("Framerate %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
+                        ImGui::GetIO().Framerate);
+            if (ImGui::CollapsingHeader("Câmera")) {
+                ImGui::BulletText(
+                        fmt::format("Posição: {}", glm::to_string(scene.getCamera().getPosition())).c_str());
+                ImGui::BulletText(fmt::format("Front: {}", glm::to_string(scene.getCamera().getFront())).c_str());
+                ImGui::BulletText(fmt::format("FOV: {}º", scene.getCamera().getFov()).c_str());
+                ImGui::BulletText(fmt::format("Max FOV: {}º", scene.getCamera().getMaxFov()).c_str());
+                ImGui::BulletText(fmt::format("Yaw: {}º", scene.getCamera().getYaw()).c_str());
+                ImGui::BulletText(fmt::format("Pitch: {}º", scene.getCamera().getPitch()).c_str());
+                ImGui::BulletText(fmt::format("Aspect: {}", scene.getCamera().getAspect()).c_str());
+                ImGui::BulletText(fmt::format("Near Plane: {}", scene.getCamera().getNearPlane()).c_str());
+                ImGui::BulletText(fmt::format("Far Plane: {}", scene.getCamera().getFarPlane()).c_str());
+                ImGui::BulletText(
+                        fmt::format("View Matrix:\n{}", matToText(scene.getCamera().getViewMatrix())).c_str());
+                ImGui::BulletText(
+                        fmt::format("Projection Matrix:\n{}",
+                                    matToText(scene.getCamera().getProjectionMatrix())).c_str());
 
+            }
+            ImGui::End();
         }
-        ImGui::End();
     }
 
 }

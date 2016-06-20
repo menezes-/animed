@@ -168,10 +168,17 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     if (action == GLFW_PRESS) {
         keys[key] = true;
         //todo: remover essa gambiarra
+        auto gui = static_cast<GUI *>(glfwGetWindowUserPointer(window));
         if (key == GLFW_KEY_F) {
-            auto gui = static_cast<GUI *>(glfwGetWindowUserPointer(window));
+
             auto &scene = gui->scene;
             scene.toggleFlashLight();
+        }
+        if(key == GLFW_KEY_F1){
+            gui->mostrarControles = !gui->mostrarControles;
+        }
+        if(key == GLFW_KEY_E){
+            gui->mostrarDebug = !gui->mostrarDebug;
         }
     }
     else if (action == GLFW_RELEASE) {
