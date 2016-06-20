@@ -4,8 +4,9 @@
 #include "../include/Utils.hpp"
 
 
-Scene::Scene(const Config &config, Camera &camera) : config(config), camera(camera),
-                                                     shaderLoader{config.shaderBasePath} {
+Scene::Scene(const Config &config, Camera &camera, int width, int height) : config(config), camera(camera),
+                                                                            shaderLoader{config.shaderBasePath},
+                                                                            width{width}, height{height} {
     camera.setMouseSensitivity(config.mouseSensitivity);
     camera.setMovementSpeed(config.cameraSpeed);
 
@@ -14,6 +15,7 @@ Scene::Scene(const Config &config, Camera &camera) : config(config), camera(came
     LightConfig flashLightConfig{};
     flashLight = SpotLight::create(flashLightConfig.position, flashLightConfig.direction, 0);
 
+    preLoadModels();
 
 }
 
@@ -23,8 +25,11 @@ void Scene::draw() {
     flashLight->setPosition(camera.getPosition());
     flashLight->setDirection(camera.getFront());
 
-    for (const auto &model: models) {
-        Shader &shader = model.second;
+    for (auto &model: models) {
+
+        if (!model.show) continue;
+
+        Shader &shader = model.shader;
 
         shader.enable();
 
@@ -44,15 +49,9 @@ void Scene::draw() {
         // .. AND THERE WAS LIGHT
         flashLight->applyUniforms(shader);
 
-        const Model &modelObj = model.first;
+        shader.setMatrix4fv("model", glm::value_ptr(model.modelMatrix));
 
-        //Matriz de transformação original do modelo
-        //todas as transformações deve ser feitas a partir desta matriz
-        glm::mat4 modelMatrix = modelObj.getModelMatrix();
-
-        shader.setMatrix4fv("model", glm::value_ptr(modelMatrix));
-
-        modelObj.draw(shader);
+        model.model.get().draw(shader);
     }
     if (renderLights && lights.size() > 0) {
 
@@ -94,32 +93,30 @@ Light *Scene::addLight(LightType type, const LightConfig &lightConfig) {
 
 }
 
-void Scene::newModelInstance(const std::string &objectName) {
-    Transform defaultTransform{};
-    newModelInstance(objectName, defaultTransform);
-}
-
-void Scene::newModelInstance(const std::string &objectName, const Transform &transform) {
+void Scene::newModelInstance(const std::string &objectName, glm::mat4 modelMatrix) {
     auto find = config.models.find(objectName);
     if (find == config.models.end()) {
         return;
     }
+    auto mof = modelsObjs.find(objectName);
+    if (mof == modelsObjs.end()) {
+        return;
+    } else {
+        auto &pair = mof->second;
+        Shader &shader = pair.second;
+        Model &model = pair.first;
+        ModelInstance instance{std::ref(model), std::ref(shader), modelMatrix};
+        models.push_back(instance);
+    }
 
-    auto modelConfig = find->second;
-
-    Shader &shader = shaderLoader.load(modelConfig.shader);
-    std::string filepath = fmt::format("{}/{}/{}", config.modelsBasePath, modelConfig.name, modelConfig.filename);
-    auto model = Model{filepath, textureLoader, transform};
-    models.push_back(std::make_pair(model, std::ref(shader)));
 }
-
 
 void Scene::setRenderLights(bool renderLights) {
     this->renderLights = renderLights;
 }
 
 void Scene::toggleFlashLight() {
-    renderFlashLight =  !renderFlashLight;
+    renderFlashLight = !renderFlashLight;
     if (renderFlashLight) {
         flashLight->setSpecular(constants::LIGHTING_SPECULAR);
         flashLight->setDiffuse(constants::LIGHTING_DIFFUSE);
@@ -134,3 +131,32 @@ void Scene::toggleFlashLight() {
 Camera &Scene::getCamera() const {
     return camera;
 }
+
+int Scene::getWidth() const {
+    return width;
+}
+
+void Scene::setWidth(int width) {
+    this->width = width;
+}
+
+int Scene::getHeight() const {
+    return height;
+}
+
+void Scene::setHeight(int height) {
+    this->height = height;
+}
+
+void Scene::preLoadModels() {
+    for (const auto &mc: config.models) {
+        auto modelConfig = mc.second;
+        Shader &shader = shaderLoader.load(modelConfig.shader);
+        std::string filepath = fmt::format("{}/{}/{}", config.modelsBasePath, modelConfig.name, modelConfig.filename);
+        auto model1 = Model{filepath, textureLoader};
+        modelsObjs.insert({mc.first, std::make_pair(model1, std::ref(shader))});
+    }
+}
+
+ModelInstance::ModelInstance(const std::reference_wrapper<Model> &model, const std::reference_wrapper<Shader> &shader,
+                             const glm::mat4 &modelMatrix) : model(model), shader(shader), modelMatrix(modelMatrix) {}

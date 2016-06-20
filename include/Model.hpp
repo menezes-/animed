@@ -13,11 +13,6 @@ class Model {
 public:
     Model(const std::string &filename, TextureLoader &textureLoader);
 
-    Model(const std::string &filename, TextureLoader &textureLoader, const Transform &transform);
-
-
-    glm::mat4 getModelMatrix() const;
-
     void draw(Shader &shader) const;
 
 private:
@@ -25,8 +20,6 @@ private:
     std::string basePath;
     std::vector<Mesh> meshes;
     TextureLoader &textureLoader;
-
-    glm::mat4 modelMatrix;
 
     void load();
 

@@ -16,6 +16,29 @@
 #include <memory>
 
 /*
+ * O struct abaixo representa uma instancia de um obj:
+ * - um pointeiro para o Model do objeto
+ * - a model matrix do objeto
+ *   (todas as transformações serao feitas em cima dessa matrix )
+ * - uma lista de transformações. Essas transformações são os keyframes do objeto e usadas na animação
+ * - um boleano que controla se a instancia é desenhada ou não
+ */
+
+struct ModelInstance {
+
+    std::reference_wrapper<Model> model;
+    std::reference_wrapper<Shader> shader;
+    glm::mat4 modelMatrix{};
+    std::vector<Transform> keyFrames{};
+
+    bool show = true;
+
+    ModelInstance(const std::reference_wrapper<Model> &model, const std::reference_wrapper<Shader> &shader,
+                  const glm::mat4 &modelMatrix);
+
+};
+
+/*
  *c++11 não provê especializações do std::hash para enum class, então eu uso o functor abaixo para
  * criar um uma especialização apra o meu enum class.
  * Para deixar as coisas mais interessantes o using abaixo decide se o map deve usar o meu functor ou o std::hash
@@ -40,13 +63,11 @@ using LightTypeHash = std::unordered_map<Key, T, HashType<Key>>;
 
 class Scene {
 public:
-    Scene(const Config &config, Camera &camera);
+    Scene(const Config &config, Camera &camera, int width, int height);
 
     void draw();
 
-    void newModelInstance(const std::string &objectName);
-
-    void newModelInstance(const std::string &objectName, const Transform &transform);
+    void newModelInstance(const std::string &objectName, glm::mat4 modelMatrix);
 
     void setRenderLights(bool renderLights);
 
@@ -63,10 +84,19 @@ public:
 
     Camera &getCamera() const;
 
+    int getWidth() const;
+
+    void setWidth(int width);
+
+    int getHeight() const;
+
+    void setHeight(int height);
+
 private:
     const Config &config;
     Camera &camera;
     ShaderLoader shaderLoader;
+    int width, height;
     std::unique_ptr<Model> lampModel;
 
     bool renderLights{false};
@@ -83,10 +113,15 @@ private:
 
     std::vector<std::unique_ptr<Light>> lights;
 
-    std::vector<std::pair<Model, std::reference_wrapper<Shader> > > models;
+    std::vector<ModelInstance> models;
+
+    std::unordered_map<std::string, std::pair<Model, std::reference_wrapper<Shader>>> modelsObjs{};
+
+    void preLoadModels();
 
     template<class T>
     void applyUniforms(const T &obj, Shader &shader) {
         obj.applyUniforms(shader);
     }
+
 };

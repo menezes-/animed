@@ -49,8 +49,3 @@ void Transform::apply(glm::mat4 &modelMatrix) const {
     modelMatrix = glm::rotate(modelMatrix, glm::radians(RZ), glm::vec3{0.0f, 0.0f, 1.0f});
     modelMatrix = glm::translate(modelMatrix, translate);
 }
-
-
-
-
-

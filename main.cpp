@@ -118,7 +118,7 @@ int main() {
     //camera.setPitch(-30.0f);
     camera.setMaxFov(90.0f);
 
-    Scene scene{config, camera};
+    Scene scene{config, camera, width, height};
 
     glfwSetWindowUserPointer(window, &scene);
 
@@ -132,11 +132,6 @@ int main() {
     scene.addLight(LightType::POINT, plc2);
     //==============ADICIONA LUZES==============
 
-
-    Transform transform{};
-    transform.setScale(glm::vec3(0.1f, 0.1f, 0.1f));
-    transform.setTranslate(glm::vec3(0.0f, -1.75f, 0.0f));
-    scene.newModelInstance("nanosuit", transform);
     ImGui_ImplGlfwGL3_Init(window, false);
 
     while (!glfwWindowShouldClose(window)) {
@@ -233,6 +228,8 @@ void window_resize_callback(GLFWwindow *window, int width, int height) {
     auto &camera = scene->getCamera();
 
     camera.setAspect(static_cast<float>(width) / static_cast<float>(height));
+    scene->setHeight(height);
+    scene->setWidth(width);
 
 }
 
@@ -240,10 +237,15 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
         mouseLock = !mouseLock;
     }
+    auto scene = static_cast<Scene *>(glfwGetWindowUserPointer(window));
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
         double x, y;
         glfwGetCursorPos(window, &x, &y);
-        std::cout << x << ' ' << y << std::endl;
+
+        glm::mat4 model=glm::inverse(scene->getCamera().getViewMatrix());
+        model = glm::scale(model,glm::vec3(0.1f, 0.1f, 0.1f));
+        model = glm::translate(model, glm::vec3(0,-.7,-5)+scene->getCamera().getFront());
+        scene->newModelInstance("nanosuit", model);
 
     }
 }
