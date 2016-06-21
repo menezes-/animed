@@ -83,6 +83,8 @@ public:
 
     glm::vec3 getFront() const;
 
+    void setFront(glm::vec3 front);
+
 private:
 
 

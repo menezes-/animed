@@ -6,7 +6,7 @@
 
 Scene::Scene(Config &config, Camera &camera, int width, int height) : config(config), camera(camera),
                                                                       shaderLoader{config.shaderBasePath},
-                                                                      width{width}, height{height} {
+                                                                      width{width}, height{height}, floor{shaderLoader, textureLoader, camera} {
     camera.setMouseSensitivity(config.mouseSensitivity);
     camera.setMovementSpeed(config.cameraSpeed);
 
@@ -52,6 +52,7 @@ void Scene::draw() {
         shader.setMatrix4fv("model", glm::value_ptr(model.modelMatrix));
         model.model.get().draw(shader);
     }
+    floor.draw();
     if (renderLights && lights.size() > 0) {
 
         Shader &lampShader = shaderLoader.load("lamp");

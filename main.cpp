@@ -126,13 +126,24 @@ int main() {
 
 
     //==============ADICIONA LUZES==============
-    LightConfig plc1; // point light 1
-    LightConfig plc2;// point light 2
-    plc1.position = glm::vec3{2.3f, -1.6f, -3.0f};
-    plc2.position = glm::vec3{-1.7f, 0.9f, 1.0f};
+    LightConfig plc1;
+    LightConfig plc2;
+    LightConfig plc3;
+    LightConfig plc4;
+
+    plc1.position = glm::vec3{-25.0f, 0.0f, 22.0f};
+    plc2.position = glm::vec3{25.0f, 0.0, -22.0f};
+    plc3.position = glm::vec3{-25.0f, 0.0, -22.0f};
+
+
+    plc4.position = glm::vec3{0.399948, 25.0, -0.847148};
+    //atenuação para uma distancia de 65
+    //plc4.attenuation = Attenuation{1.0, 0.07, 0.017};
 
     scene.addLight(LightType::POINT, plc1);
     scene.addLight(LightType::POINT, plc2);
+    scene.addLight(LightType::POINT, plc3);
+    scene.addLight(LightType::POINT, plc4);
     //==============ADICIONA LUZES==============
 
     ImGui_ImplGlfwGL3_Init(window, false);
@@ -165,6 +176,8 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
+    //evita ativar as teclas de teclado enquanto digitando
+    if (ImGui::GetIO().WantTextInput) return;
     if (action == GLFW_PRESS) {
         keys[key] = true;
         //todo: remover essa gambiarra
@@ -179,6 +192,11 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         }
         if (key == GLFW_KEY_E) {
             gui->mostrarDebug = !gui->mostrarDebug;
+        }
+        if (key == GLFW_KEY_R) {
+            auto &camera = gui->scene.getCamera();
+            camera.setPosition(glm::vec3{0.0f, 0.0f, 3.0f});
+            camera.setFront(glm::vec3{0.0f, 0.0f, -1.0f});
         }
     }
     else if (action == GLFW_RELEASE) {

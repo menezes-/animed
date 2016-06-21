@@ -9,6 +9,7 @@
 #include "Loaders/ShaderLoader.hpp"
 #include "Light/Light.hpp"
 #include "Light/SpotLight.hpp"
+#include "Objects/Floor.hpp"
 #include <string>
 #include <vector>
 #include <utility>
@@ -127,11 +128,12 @@ private:
 
     std::unordered_map<std::string, std::pair<Model, std::reference_wrapper<Shader>>> modelsObjs{};
 
+    Floor floor;
+
     void preLoadModels();
 
     template<class T>
     void applyUniforms(const T &obj, Shader &shader) {
         obj.applyUniforms(shader);
     }
-
 };

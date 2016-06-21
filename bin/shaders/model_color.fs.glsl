@@ -39,7 +39,7 @@ struct PointLight {
 };
 
 // quantos pontos de luz eu tenho
-#define N_POINT_LIGHTS 2
+#define N_POINT_LIGHTS 4
 
 in vec3 fragPosition;
 in vec3 Normal;

@@ -207,6 +207,9 @@ void GUI::makeGUI() {
 
     {
         if (mostrarDebug) {
+            if(ImGui::Button("copiar")){
+                ImGui::LogToClipboard(1);
+            }
             ImGui::Begin("Debug", &mostrarDebug, ImGuiWindowFlags_AlwaysAutoResize);
             ImGui::Text("Framerate %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
                         ImGui::GetIO().Framerate);

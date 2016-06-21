@@ -47,7 +47,7 @@ struct Material {
 
 
 
-#define N_POINT_LIGHTS 2
+#define N_POINT_LIGHTS 4
 
 in vec3 FragPos;
 in vec3 Normal;

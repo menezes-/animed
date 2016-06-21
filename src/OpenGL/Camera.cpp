@@ -179,3 +179,7 @@ glm::vec3 Camera::getFront() const {
     return front;
 }
 
+void Camera::setFront(glm::vec3 front) {
+    this->front = front;
+}
+
