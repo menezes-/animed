@@ -112,8 +112,7 @@ void GUI::makeGUI() {
                         ImColor color = instancia.show ? ImColor{0, 255, 0} : ImColor{255, 0, 0};
                         ImGui::PushStyleColor(ImGuiCol_Text, color);
                         if (ImGui::TreeNode(fmt::format("{} {}", instancia.objectName, instancia.count).c_str())) {
-                            selectedInstance = &instancia;
-                            instancia.showBorder = true;
+
                             ImGui::PushStyleColor(ImGuiCol_Text, ImColor{255, 255, 255});
                             const char *label = instancia.show ? "Esconder" : "Exibir";
                             if (ImGui::SmallButton(label)) {
@@ -122,18 +121,16 @@ void GUI::makeGUI() {
                             ImGui::SameLine();
                             if (ImGui::SmallButton("Editar")) {
                                 if (!editedTransform) {
+                                    selectedInstanceCreation = &instancia;
                                     editedTransform = &instancia.transform;
                                     tempTransform = Transform{};
                                     previousModelMatrix = instancia.modelMatrix;
+                                    instancia.showBorder = true;
+
                                 }
                             }
                             ImGui::TreePop();
                             ImGui::PopStyleColor();
-                        } else {
-                            if (selectedInstance == &instancia) {
-                                selectedInstance = nullptr;
-                                instancia.showBorder = false;
-                            }
                         }
                         ImGui::PopStyleColor(1);
                     }
@@ -154,7 +151,7 @@ void GUI::makeGUI() {
             GLfloat escala = tempTransform.getScale().x;
             if (ImGui::DragFloat("Escala", &escala, 0.01f, .1f, 10.0f)) {
                 tempTransform.setScale(glm::vec3{escala});
-                tempTransform.apply(selectedInstance->modelMatrix);
+                tempTransform.apply(selectedInstanceCreation->modelMatrix);
             }
             ImGui::Separator();
             GLfloat RX = tempTransform.getRotation(Axis::X);
@@ -162,32 +159,34 @@ void GUI::makeGUI() {
             GLfloat RZ = tempTransform.getRotation(Axis::Z);
             if (ImGui::SliderAngle("Rotção e. X", &RX)) {
                 tempTransform.setRotation(RX, Axis::X);
-                tempTransform.apply(selectedInstance->modelMatrix);
+                tempTransform.apply(selectedInstanceCreation->modelMatrix);
             }
             if (ImGui::SliderAngle("Rotção e. Y", &RY)) {
                 tempTransform.setRotation(RY, Axis::Y);
-                tempTransform.apply(selectedInstance->modelMatrix);
+                tempTransform.apply(selectedInstanceCreation->modelMatrix);
             }
             if (ImGui::SliderAngle("Rotção e. Z", &RZ)) {
                 tempTransform.setRotation(RZ, Axis::Z);
-                tempTransform.apply(selectedInstance->modelMatrix);
+                tempTransform.apply(selectedInstanceCreation->modelMatrix);
             }
             ImGui::Separator();
             glm::vec3 translate = tempTransform.getTranslate();
             if (ImGui::DragFloat3("Translate", (float *) &translate, 1.0f, -1000.0f, 1000.0f)) {
                 tempTransform.setTranslate(translate);
-                tempTransform.apply(selectedInstance->modelMatrix);
+                tempTransform.apply(selectedInstanceCreation->modelMatrix);
             }
             if (ImGui::Button("Aplicar", ImVec2(120, 0))) {
 
                 *editedTransform = tempTransform;
                 editedTransform = nullptr;
                 tempTransform = Transform{};
+                selectedInstanceCreation->showBorder = false;
+                selectedInstanceCreation = nullptr;
             }
             ImGui::SameLine();
             if (ImGui::Button("Cancelar")) {
                 tempTransform = Transform{};
-                selectedInstance->modelMatrix = previousModelMatrix;
+                selectedInstanceCreation->modelMatrix = previousModelMatrix;
             }
         } else {
             if (ImGui::ColorEdit3("Cor de fundo", (float *) &clear_color)) {
@@ -269,7 +268,7 @@ void GUI::makeGUI() {
                 if (!filterInstances.PassFilter(instancia.objectName.c_str()) || !instancia.show) continue;
                 if (ImGui::TreeNode("instancias2",
                                     fmt::format("{} {}", instancia.objectName, instancia.count).c_str())) {
-                    selectedInstance = &instancia;
+                    selectedInstanceAnimation = &instancia;
 
                 }
             }

@@ -30,7 +30,8 @@ struct GUI {
 
     GLFWwindow *window;
 
-    ModelInstance* selectedInstance = nullptr;
+    ModelInstance* selectedInstanceCreation = nullptr;
+    ModelInstance* selectedInstanceAnimation = nullptr;
 
     const std::string *nextInstance = nullptr;
 
