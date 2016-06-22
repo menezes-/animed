@@ -28,7 +28,10 @@ void Scene::draw() {
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
-    glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glStencilMask(0x00);
+    floor.draw();
 
     for (auto &model: models) {
 
@@ -106,10 +109,9 @@ void Scene::draw() {
      * Ou pode ser que o certo seja, realmente, desabi porem desabilitar GL_STENCIL_TEST, porém eu não encontrei nada sobre
      * o assunto. de qualquer forma sem o glDisable abaixo nada funciona.
      */
-    glDisable(GL_STENCIL_TEST);
+
 
     //o chão e as lampadas não podem encher o stencil buffer
-    floor.draw();
     if (renderLights && lights.size() > 0) {
 
         Shader &lampShader = shaderLoader.load("lamp");

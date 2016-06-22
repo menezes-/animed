@@ -204,6 +204,7 @@ void GUI::makeGUI() {
                     glDisable(GL_MULTISAMPLE);
                 }
             }
+            ImGui::Checkbox("Renderizar o chão", &scene.renderFloor);
             int numKeyframes = static_cast<int>(scene.numKeyframes);
             if (ImGui::InputInt("Número de KeyFrames", &numKeyframes, 1, 10)) {
                 if (numKeyframes > 0) {

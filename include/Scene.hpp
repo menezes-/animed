@@ -123,6 +123,8 @@ private:
 
     bool renderFlashLight{true};
 
+    bool renderFloor{true};
+
     TextureLoader textureLoader{};
 
     std::unique_ptr<SpotLight> flashLight;
