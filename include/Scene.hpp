@@ -141,6 +141,8 @@ private:
 
     void preLoadModels();
 
+   Shader stencilShader{"shaders/model.vs.glsl","shaders/stencil_testing.fs.glsl"};
+
     template<class T>
     void applyUniforms(const T &obj, Shader &shader) {
         obj.applyUniforms(shader);

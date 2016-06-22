@@ -6,7 +6,9 @@
 
 Scene::Scene(Config &config, Camera &camera, int width, int height) : config(config), camera(camera),
                                                                       shaderLoader{config.shaderBasePath},
-                                                                      width{width}, height{height}, floor{shaderLoader, textureLoader, camera} {
+                                                                      width{width}, height{height},
+                                                                      floor{shaderLoader, textureLoader, camera}
+{
     camera.setMouseSensitivity(config.mouseSensitivity);
     camera.setMovementSpeed(config.cameraSpeed);
 
@@ -48,10 +50,51 @@ void Scene::draw() {
         }
         // .. AND THERE WAS LIGHT
         flashLight->applyUniforms(shader);
-
+        glEnable(GL_STENCIL_TEST);
+        //desenha os objetos normalmente e enche o stencil buffer
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
         shader.setMatrix4fv("model", glm::value_ptr(model.modelMatrix));
         model.model.get().draw(shader);
+
+        //esse é o segundo passe, a gente desenha o objeto um pouco maior
+        //pra usar o stencil buffer e desenhar as borda
+        //nesse ponto o stencil buffer ta ""positivo"" (1) em tudo que é desenhado
+        //então agora a gente "inverte", ou seja, tudo que for 1 não é desenhado
+        //desenhando então só a diferença de tamanho entre os objetos (a gente escala o objeto um pouco no segundo passe)
+
+        //PS: acho que tem uma outra função (glStencilFunc) que dava pra usar, ou usar uma mascara direto. não tenho cereteza
+        // tem que testar
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+        glDisable(GL_DEPTH_TEST); // tem que desabilitar antes de desenhar o segundo passe se não da merda.
+
+        //segundo ""passe"" propriamente dito
+        stencilShader.enable();
+
+        // tem que aplicar as mesmas transformaçoes pra deixar o bagulho no mesmo sistema de referência da camera
+        applyUniforms(camera, stencilShader);
+
+        glm::mat4 bigModel = model.modelMatrix;
+        GLfloat scale = 1.01;
+        bigModel = glm::scale(bigModel, glm::vec3(scale, scale, scale)); // escala só um pouco
+        stencilShader.setMatrix4fv("model", glm::value_ptr(bigModel));
+        model.model.get().draw(stencilShader);
+        // terminou o segundo passe volta tudo ao normal
+        glStencilMask(0xFF);
+        glEnable(GL_DEPTH_TEST);
     }
+    /*
+     * teoricamente apenar usar um glStencilMask(0x00); deveria "desabilitar" (não deveria encher o buffer sabe?)
+     * o stencil pros objetos a seguir (e pra GUI também), porém, só usar o StencilMask não funciona direto
+     * e da merda em toda a cena. Pode ser por causa da GUI ou pode ser que eu esteja fazendo algo errado.
+     * Ou pode ser que o certo seja, realmente, desabi porem desabilitar GL_STENCIL_TEST, porém eu não encontrei nada sobre
+     * o assunto. de qualquer forma sem o glDisable abaixo nada funciona.
+     */
+    glStencilMask(0x00);
+    glDisable(GL_STENCIL_TEST);
+
+    //o chão e as lampadas não podem encher o stencil buffer
     floor.draw();
     if (renderLights && lights.size() > 0) {
 

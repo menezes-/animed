@@ -80,7 +80,12 @@ static GLFWwindow *setupGraphics(const Config &config) {
         throw std::runtime_error{"Nao foi possivel inicializar o glew! "};
     }
 
+    //configura stencil buffer
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
     if (config.multiSamples) {
         glEnable(GL_MULTISAMPLE);
     }
@@ -158,7 +163,7 @@ int main() {
         gui.makeGUI();
         doMovement();
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         scene.draw();
         if (gui.state != GUIState::MODEL_SELECTED) {
             ImGui::Render();
