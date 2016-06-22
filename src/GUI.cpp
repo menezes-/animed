@@ -121,7 +121,7 @@ void GUI::makeGUI() {
                             ImGui::SameLine();
                             if (ImGui::SmallButton("Editar")) {
                                 if (!editedTransform) {
-                                    selectedInstanceCreation = &instancia;
+                                    selectedInstance = &instancia;
                                     editedTransform = &instancia.transform;
                                     tempTransform = Transform{};
                                     previousModelMatrix = instancia.modelMatrix;
@@ -151,7 +151,7 @@ void GUI::makeGUI() {
             GLfloat escala = tempTransform.getScale().x;
             if (ImGui::DragFloat("Escala", &escala, 0.01f, .1f, 10.0f)) {
                 tempTransform.setScale(glm::vec3{escala});
-                tempTransform.apply(selectedInstanceCreation->modelMatrix);
+                tempTransform.apply(selectedInstance->modelMatrix);
             }
             ImGui::Separator();
             GLfloat RX = tempTransform.getRotation(Axis::X);
@@ -159,34 +159,34 @@ void GUI::makeGUI() {
             GLfloat RZ = tempTransform.getRotation(Axis::Z);
             if (ImGui::SliderAngle("Rotção e. X", &RX)) {
                 tempTransform.setRotation(RX, Axis::X);
-                tempTransform.apply(selectedInstanceCreation->modelMatrix);
+                tempTransform.apply(selectedInstance->modelMatrix);
             }
             if (ImGui::SliderAngle("Rotção e. Y", &RY)) {
                 tempTransform.setRotation(RY, Axis::Y);
-                tempTransform.apply(selectedInstanceCreation->modelMatrix);
+                tempTransform.apply(selectedInstance->modelMatrix);
             }
             if (ImGui::SliderAngle("Rotção e. Z", &RZ)) {
                 tempTransform.setRotation(RZ, Axis::Z);
-                tempTransform.apply(selectedInstanceCreation->modelMatrix);
+                tempTransform.apply(selectedInstance->modelMatrix);
             }
             ImGui::Separator();
             glm::vec3 translate = tempTransform.getTranslate();
             if (ImGui::DragFloat3("Translate", (float *) &translate, 1.0f, -1000.0f, 1000.0f)) {
                 tempTransform.setTranslate(translate);
-                tempTransform.apply(selectedInstanceCreation->modelMatrix);
+                tempTransform.apply(selectedInstance->modelMatrix);
             }
             if (ImGui::Button("Aplicar", ImVec2(120, 0))) {
 
                 *editedTransform = tempTransform;
                 editedTransform = nullptr;
                 tempTransform = Transform{};
-                selectedInstanceCreation->showBorder = false;
-                selectedInstanceCreation = nullptr;
+                selectedInstance->showBorder = false;
+                selectedInstance = nullptr;
             }
             ImGui::SameLine();
-            if (ImGui::Button("Cancelar")) {
+            if (ImGui::Button("Resetar Valores")) {
                 tempTransform = Transform{};
-                selectedInstanceCreation->modelMatrix = previousModelMatrix;
+                selectedInstance->modelMatrix = previousModelMatrix;
             }
         } else {
             if (ImGui::ColorEdit3("Cor de fundo", (float *) &clear_color)) {
@@ -204,13 +204,7 @@ void GUI::makeGUI() {
                 }
             }
             ImGui::Checkbox("Renderizar o chão", &scene.renderFloor);
-            int numKeyframes = static_cast<int>(scene.numKeyframes);
-            if (ImGui::InputInt("Número de KeyFrames", &numKeyframes, 1, 10)) {
-                if (numKeyframes > 0) {
-                    scene.numKeyframes = static_cast<std::size_t >(numKeyframes);
-                }
-            }
-            int numFrames = static_cast<int>(scene.numKeyframes);
+            int numFrames = static_cast<int>(scene.numFrames);
             if (ImGui::InputInt("Número de frames\nintermediários", &numFrames, 1, 10)) {
                 if (numFrames > 0) {
                     scene.numFrames = static_cast<std::size_t >(numFrames);
@@ -256,6 +250,9 @@ void GUI::makeGUI() {
 
     if (!scene.models.empty()) {
 
+        static Transform *editedTransform = nullptr;
+        static Transform tempTransform = Transform{};
+        static glm::mat4 previousModelMatrix{};
 
         ImGui::Begin("Animação");
         ImGui::BeginChild("instances", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 0), false,
@@ -266,10 +263,17 @@ void GUI::makeGUI() {
             filterInstances.Draw("Filtrar");
             for (auto &instancia: scene.models) {
                 if (!filterInstances.PassFilter(instancia.objectName.c_str()) || !instancia.show) continue;
-                if (ImGui::TreeNode("instancias2",
-                                    fmt::format("{} {}", instancia.objectName, instancia.count).c_str())) {
-                    selectedInstanceAnimation = &instancia;
-
+                if (ImGui::TreeNode(fmt::format("{} {}", instancia.objectName, instancia.count).c_str())) {
+                    for (std::size_t j = 0; j < scene.numKeyframes; ++j) {
+                        if (ImGui::Selectable(fmt::format("Keyframe {}", j + 1).c_str())) {
+                            selectedInstanceAnimation = &instancia;
+                            editedTransform = &instancia.keyFrames[j];
+                            tempTransform = Transform{};
+                            previousModelMatrix = instancia.modelMatrix;
+                            instancia.showBorder = true;
+                        }
+                    }
+                    ImGui::TreePop();
                 }
             }
             ImGui::TreePop();
@@ -281,12 +285,66 @@ void GUI::makeGUI() {
 
         ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
         ImGui::BeginChild("configkeyframes", ImVec2(0, 300), true);
-        ImGui::Text("KeyFrames");
-        for (std::size_t i = 0; i < scene.numKeyframes; ++i) {
-            if (ImGui::TreeNode(fmt::format("Keyframe {}", i).c_str())) {
+        ImGui::Text("KeyFrame");
+        if (editedTransform) {
 
+            GLfloat escala = tempTransform.getScale().x;
+            if (ImGui::DragFloat("Escala", &escala, 0.01f, .1f, 10.0f)) {
+                tempTransform.setScale(glm::vec3{escala});
+                tempTransform.apply(selectedInstanceAnimation->modelMatrix);
+            }
+            ImGui::Separator();
+            GLfloat RX = tempTransform.getRotation(Axis::X);
+            GLfloat RY = tempTransform.getRotation(Axis::Y);
+            GLfloat RZ = tempTransform.getRotation(Axis::Z);
+            if (ImGui::SliderAngle("Rotção e. X", &RX)) {
+                tempTransform.setRotation(RX, Axis::X);
+                tempTransform.apply(selectedInstanceAnimation->modelMatrix);
+            }
+            if (ImGui::SliderAngle("Rotção e. Y", &RY)) {
+                tempTransform.setRotation(RY, Axis::Y);
+                tempTransform.apply(selectedInstanceAnimation->modelMatrix);
+            }
+            if (ImGui::SliderAngle("Rotção e. Z", &RZ)) {
+                tempTransform.setRotation(RZ, Axis::Z);
+                tempTransform.apply(selectedInstanceAnimation->modelMatrix);
+            }
+            ImGui::Separator();
+            glm::vec3 translate = tempTransform.getTranslate();
+            if (ImGui::DragFloat3("Translate", (float *) &translate, 1.0f, -1000.0f, 1000.0f)) {
+                tempTransform.setTranslate(translate);
+                tempTransform.apply(selectedInstanceAnimation->modelMatrix);
+            }
+            if (ImGui::Button("Aplicar", ImVec2(120, 0))) {
+
+                *editedTransform = tempTransform;
+                editedTransform = nullptr;
+                tempTransform = Transform{};
+                selectedInstanceAnimation->showBorder = false;
+                selectedInstanceAnimation->modelMatrix = previousModelMatrix;
+                selectedInstanceAnimation = nullptr;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancelar")) {
+                tempTransform = Transform{};
+                selectedInstanceAnimation->modelMatrix = previousModelMatrix;
+                selectedInstanceAnimation->showBorder = false;
+                editedTransform = nullptr;
+                selectedInstanceAnimation = nullptr;
+            }
+            if (editedTransform) {
+                ImGui::Separator();
+                ImGui::Text("Valores Atuais");
+                ImGui::BulletText(fmt::format("Escala: {}", editedTransform->getScale().x).c_str());
+                ImGui::BulletText(fmt::format("Rotação e. X: {}", editedTransform->getRotation(Axis::X)).c_str());
+                ImGui::BulletText(fmt::format("Rotação e. Y: {}", editedTransform->getRotation(Axis::Y)).c_str());
+                ImGui::BulletText(fmt::format("Rotação e. Z: {}", editedTransform->getRotation(Axis::Z)).c_str());
+                ImGui::BulletText(
+                        fmt::format("Translate: {}", glm::to_string(editedTransform->getTranslate())).c_str());
             }
         }
+
+
         ImGui::EndChild();
         ImGui::PopStyleVar(1);
         ImGui::End();

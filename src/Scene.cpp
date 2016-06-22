@@ -31,7 +31,10 @@ void Scene::draw() {
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glStencilMask(0x00);
-    floor.draw();
+
+    if (renderFloor) {
+        floor.draw();
+    }
 
     for (auto &model: models) {
 
@@ -167,6 +170,7 @@ void Scene::newModelInstance(const std::string &objectName, glm::mat4 modelMatri
         Model &model = pair.first;
         ModelInstance instance{std::ref(model), std::ref(shader), modelMatrix, objectName};
         instance.count = counter;
+        instance.keyFrames.resize(numKeyframes, Transform{});
         models.push_back(instance);
     }
 
