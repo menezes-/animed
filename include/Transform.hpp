@@ -3,7 +3,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-enum class Axis : short {
+enum  Axis : short {
     X,
     Y,
     Z
@@ -35,6 +35,8 @@ public:
     void apply(glm::mat4 &modelMatrix) const;
     void apply(glm::mat4 *modelMatrix) const;
 
+    bool isEmpty() const;
+
 private:
     GLfloat RX;
     GLfloat RY;
@@ -43,6 +45,8 @@ private:
     glm::vec3 scale{1.0f};
 
     glm::vec3 translate;
+
+    bool empty = false;
 
 };
 

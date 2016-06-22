@@ -72,6 +72,55 @@ void Scene::draw() {
             glStencilMask(0xFF);
         }
 
+        if (play) {
+            if (currentFrame < numFrames) {
+                Transform interpolated{};
+                auto current = model.keyFrames[currentKeyFrame];
+                auto next = model.keyFrames[currentKeyFrame + 1];
+                for (int i = 0; i < 3; ++i) {
+                    auto valor_atual_rot = current.getRotation(Axis::X);
+                    auto valor_proximo_rot = next.getRotation(Axis::X);
+                    auto valor_rot = (valor_proximo_rot - valor_atual_rot) / numFrames * currentFrame + valor_atual_rot;
+                    interpolated.setRotation(valor_rot, static_cast<Axis >(i));
+                }
+
+                auto valor_atual_escala = current.getScale().x;
+                auto valor_proximo_escala = next.getScale().x;
+                float escala;
+                if (valor_proximo_escala - valor_atual_escala <= 0) {
+                    escala = 1;
+                } else {
+                    escala =
+                            (valor_proximo_escala - valor_atual_escala) / numFrames * currentFrame + valor_atual_escala;
+                }
+                interpolated.setScale(glm::vec3{escala});
+
+                auto valor_atual_trans = current.getTranslate();
+                auto valor_proximo_trans = next.getTranslate();
+
+                glm::vec3 valor_trans{};
+                valor_trans.x =
+                        (valor_proximo_trans.x - valor_atual_trans.x) / numFrames * currentFrame + valor_atual_trans.x;
+                valor_trans.y =
+                        (valor_proximo_trans.y - valor_atual_trans.y) / numFrames * currentFrame + valor_atual_trans.y;
+                valor_trans.z =
+                        (valor_proximo_trans.z - valor_atual_trans.z) / numFrames * currentFrame + valor_atual_trans.z;
+
+                interpolated.setTranslate(valor_trans);
+
+                interpolated.apply(model.modelMatrix);
+
+            } else {
+                if (currentKeyFrame >= numKeyframes) {
+                    currentKeyFrame = 0;
+                    model.reset();
+                } else {
+                    currentKeyFrame++;
+                }
+                currentFrame = 0;
+            }
+        }
+
         shader.setMatrix4fv("model", glm::value_ptr(model.modelMatrix));
         model.model.get().draw(shader);
 
@@ -104,6 +153,9 @@ void Scene::draw() {
             glStencilMask(0xFF);
             glEnable(GL_DEPTH_TEST);
         }
+    }
+    if (play) {
+        currentFrame++;
     }
     /*
      * teoricamente apenar usar um glStencilMask(0x00); deveria "desabilitar" (não deveria encher o buffer sabe?)
@@ -224,7 +276,20 @@ void Scene::preLoadModels() {
     }
 }
 
+void Scene::resetAnimation() {
+
+    for(auto& model:models){
+        model.reset();
+    }
+
+}
+
 ModelInstance::ModelInstance(const std::reference_wrapper<Model> &model, const std::reference_wrapper<Shader> &shader,
                              const glm::mat4 &modelMatrix, std::string objectName) : model(model), shader(shader),
                                                                                      modelMatrix(modelMatrix),
                                                                                      objectName{objectName} {}
+
+void ModelInstance::reset() {
+    modelMatrix = modelMatrixOriginal;
+
+}

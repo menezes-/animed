@@ -6,6 +6,7 @@ glm::vec3 Transform::getScale() const {
 }
 
 void Transform::setScale(glm::vec3 scale) {
+    empty = false;
     this->scale = scale;
 }
 
@@ -14,10 +15,12 @@ glm::vec3 Transform::getTranslate() const {
 }
 
 void Transform::setTranslate(glm::vec3 translate) {
+    empty = false;
     this->translate = translate;
 }
 
 void Transform::setRotation(GLfloat angle, Axis axis) {
+    empty = false;
     switch (axis) {
         case Axis::X:
             RX = angle;
@@ -57,4 +60,8 @@ void Transform::apply(glm::mat4 *modelMatrix) const {
     *modelMatrix = glm::rotate(*modelMatrix, glm::radians(RZ), glm::vec3{0.0f, 0.0f, 1.0f});
     *modelMatrix = glm::translate(*modelMatrix, translate);
 
+}
+
+bool Transform::isEmpty() const {
+    return empty;
 }

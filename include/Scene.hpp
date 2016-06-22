@@ -29,6 +29,7 @@ struct ModelInstance {
 
     std::reference_wrapper<Model> model;
     std::reference_wrapper<Shader> shader;
+    glm::mat4 modelMatrixOriginal{};
     glm::mat4 modelMatrix{};
     std::string objectName;
     std::vector<Transform> keyFrames{};
@@ -44,6 +45,8 @@ struct ModelInstance {
     bool show = true;
 
     bool showBorder = false;
+
+    void reset();
 
 
     ModelInstance(const std::reference_wrapper<Model> &model, const std::reference_wrapper<Shader> &shader,
@@ -114,7 +117,7 @@ private:
     int width, height;
     std::unique_ptr<Model> lampModel;
 
-    std::size_t numKeyframes = 10;
+    std::size_t numKeyframes = 2;
     std::size_t numFrames = 100;
     std::size_t currentFrame = 0;
     std::size_t currentKeyFrame = 0;
@@ -124,6 +127,8 @@ private:
     bool renderFlashLight{true};
 
     bool renderFloor{true};
+
+    bool play{false};
 
     TextureLoader textureLoader{};
 
@@ -144,6 +149,8 @@ private:
     Floor floor;
 
     void preLoadModels();
+
+    void resetAnimation();
 
    Shader stencilShader{"shaders/stencil_testing.vs.glsl","shaders/stencil_testing.fs.glsl"};
 

@@ -180,6 +180,7 @@ void GUI::makeGUI() {
                 *editedTransform = tempTransform;
                 editedTransform = nullptr;
                 tempTransform = Transform{};
+                selectedInstance->modelMatrixOriginal = selectedInstance->modelMatrix;
                 selectedInstance->showBorder = false;
                 selectedInstance = nullptr;
             }
@@ -204,6 +205,17 @@ void GUI::makeGUI() {
                 }
             }
             ImGui::Checkbox("Renderizar o chão", &scene.renderFloor);
+
+            int numKeyframes = static_cast<int>(scene.numKeyframes);
+            if (ImGui::InputInt("Número de KeyFrames", &numKeyframes, 1, 10)) {
+                if (numKeyframes > 0) {
+                    scene.numKeyframes = static_cast<std::size_t >(numKeyframes);
+                    for (auto &model:scene.models) {
+                        model.keyFrames.resize(scene.numKeyframes, Transform{});
+                    }
+                }
+            }
+
             int numFrames = static_cast<int>(scene.numFrames);
             if (ImGui::InputInt("Número de frames\nintermediários", &numFrames, 1, 10)) {
                 if (numFrames > 0) {
@@ -255,6 +267,13 @@ void GUI::makeGUI() {
         static glm::mat4 previousModelMatrix{};
 
         ImGui::Begin("Animação");
+        ImGui::Checkbox("Play", &scene.play);
+        ImGui::SameLine();
+        ImGui::Text(fmt::format("{} frame / {} keyframe", scene.currentFrame, scene.currentKeyFrame).c_str());
+        if(ImGui::Button("Resetar")){
+            scene.currentKeyFrame = 0;
+            scene.currentFrame = 0;
+        }
         ImGui::BeginChild("instances", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 0), false,
                           ImGuiWindowFlags_HorizontalScrollbar);
 
