@@ -102,12 +102,16 @@ void Scene::newModelInstance(const std::string &objectName, glm::mat4 modelMatri
     if (mof == modelsObjs.end()) {
         return;
     } else {
+        auto counter = instanceCounter[objectName]++;
         auto &pair = mof->second;
         Shader &shader = pair.second;
         Model &model = pair.first;
         ModelInstance instance{std::ref(model), std::ref(shader), modelMatrix, objectName};
+        instance.count = counter;
         models.push_back(instance);
     }
+
+
 
 }
 

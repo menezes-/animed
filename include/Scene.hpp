@@ -33,6 +33,8 @@ struct ModelInstance {
     std::string objectName;
     std::vector<Transform> keyFrames{};
 
+    int count;
+
     /**
      * O objeto transform abaixo serve como um placeholder para guardar modificações
      * feitas através da interface de usuário no modelMatrix do objeto.
@@ -110,6 +112,11 @@ private:
     int width, height;
     std::unique_ptr<Model> lampModel;
 
+    std::size_t numKeyframes = 10;
+    std::size_t numFrames = 100;
+    std::size_t currentFrame = 0;
+    std::size_t currentKeyFrame = 0;
+
     bool renderLights{false};
 
     bool renderFlashLight{true};
@@ -127,6 +134,8 @@ private:
     std::vector<ModelInstance> models;
 
     std::unordered_map<std::string, std::pair<Model, std::reference_wrapper<Shader>>> modelsObjs{};
+
+    std::unordered_map<std::string, int> instanceCounter{};
 
     Floor floor;
 

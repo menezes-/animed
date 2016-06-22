@@ -106,12 +106,11 @@ void GUI::makeGUI() {
                 if (ImGui::TreeNode("Instâncias")) {
                     static ImGuiTextFilter filterInstances;
                     filterInstances.Draw("Filtrar");
-                    int counter = 0;
                     for (auto &instancia: scene.models) {
                         if (!filterInstances.PassFilter(instancia.objectName.c_str())) continue;
                         ImColor color = instancia.show ? ImColor{0, 255, 0} : ImColor{255, 0, 0};
                         ImGui::PushStyleColor(ImGuiCol_Text, color);
-                        if (ImGui::TreeNode(fmt::format("{} {}", instancia.objectName, ++counter).c_str())) {
+                        if (ImGui::TreeNode(fmt::format("{} {}", instancia.objectName, instancia.count).c_str())) {
                             selectedInstance = &instancia;
                             ImGui::PushStyleColor(ImGuiCol_Text, ImColor{255, 255, 255});
                             const char *label = instancia.show ? "Esconder" : "Exibir";
@@ -199,6 +198,18 @@ void GUI::makeGUI() {
                     glDisable(GL_MULTISAMPLE);
                 }
             }
+            int numKeyframes = static_cast<int>(scene.numKeyframes);
+            if (ImGui::InputInt("Número de KeyFrames", &numKeyframes, 1, 10)) {
+                if (numKeyframes > 0) {
+                    scene.numKeyframes = static_cast<std::size_t >(numKeyframes);
+                }
+            }
+            int numFrames = static_cast<int>(scene.numKeyframes);
+            if (ImGui::InputInt("Número de frames\nintermediários", &numFrames, 1, 10)) {
+                if (numFrames > 0) {
+                    scene.numFrames = static_cast<std::size_t >(numFrames);
+                }
+            }
         }
         ImGui::EndChild();
         ImGui::PopStyleVar();
@@ -207,10 +218,11 @@ void GUI::makeGUI() {
 
     {
         if (mostrarDebug) {
-            if(ImGui::Button("copiar")){
+            ImGui::Begin("Debug", &mostrarDebug, ImGuiWindowFlags_AlwaysAutoResize);
+
+            if (ImGui::Button("copiar")) {
                 ImGui::LogToClipboard(1);
             }
-            ImGui::Begin("Debug", &mostrarDebug, ImGuiWindowFlags_AlwaysAutoResize);
             ImGui::Text("Framerate %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
                         ImGui::GetIO().Framerate);
             if (ImGui::CollapsingHeader("Câmera")) {
@@ -235,6 +247,45 @@ void GUI::makeGUI() {
         }
     }
 
+
+    if (!scene.models.empty()) {
+
+
+        ImGui::Begin("Animação");
+        ImGui::BeginChild("instances", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 0), false,
+                          ImGuiWindowFlags_HorizontalScrollbar);
+
+        if (ImGui::TreeNode("instancias_keyframe","Instâncias")) {
+            static ImGuiTextFilter filterInstances;
+            filterInstances.Draw("Filtrar");
+            int counter = 0;
+            for (auto &instancia: scene.models) {
+                if (!filterInstances.PassFilter(instancia.objectName.c_str()) || !instancia.show) continue;
+                if (ImGui::TreeNode("instancias2", fmt::format("{} {}", instancia.objectName, ++counter).c_str())) {
+                    selectedInstance = &instancia;
+
+                }
+            }
+            ImGui::TreePop();
+        }
+
+        ImGui::EndChild();
+
+        ImGui::SameLine();
+
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
+        ImGui::BeginChild("configkeyframes", ImVec2(0, 300), true);
+        ImGui::Text("KeyFrames");
+        for (std::size_t i = 0; i < scene.numKeyframes; ++i) {
+            if (ImGui::TreeNode(fmt::format("Keyframe {}", i).c_str())) {
+
+            }
+        }
+        ImGui::EndChild();
+        ImGui::PopStyleVar(1);
+        ImGui::End();
+
+    }
 }
 
 GUI::GUI(Scene &scene, GLFWwindow *window) : scene(scene), window(window) {

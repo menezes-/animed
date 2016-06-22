@@ -138,7 +138,9 @@ set(SOURCE_FILES main.cpp src/OpenGL/Camera.cpp
         src/Light/Light.cpp
         include/Light/Light.hpp
         src/Light/SpotLight.cpp
-        include/Light/SpotLight.hpp src/Objects/Floor.cpp include/Objects/Floor.hpp)
+        include/Light/SpotLight.hpp
+        src/Objects/Floor.cpp
+        include/Objects/Floor.hpp)
 add_executable(animation_editor ${SOURCE_FILES})
 
 #======================SHADERS=====================
