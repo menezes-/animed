@@ -76,9 +76,10 @@ void GUI::makeGUI() {
         static Transform *editedTransform = nullptr;
         static Transform tempTransform = Transform{};
         static glm::mat4 previousModelMatrix{};
-        ImGui::Begin("Geral", &showGeral, glm::vec2{800, 650}, -1.0f);
+        static int height = 700;
+        ImGui::Begin("Geral", &showGeral, glm::vec2{800, height}, -1.0f);
 
-        ImGui::BeginChild("models", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 300), false,
+        ImGui::BeginChild("models", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, height - 10), false,
                           ImGuiWindowFlags_HorizontalScrollbar);
 
         if (ImGui::CollapsingHeader("Objetos")) {
@@ -112,6 +113,7 @@ void GUI::makeGUI() {
                         ImGui::PushStyleColor(ImGuiCol_Text, color);
                         if (ImGui::TreeNode(fmt::format("{} {}", instancia.objectName, instancia.count).c_str())) {
                             selectedInstance = &instancia;
+                            instancia.showBorder = true;
                             ImGui::PushStyleColor(ImGuiCol_Text, ImColor{255, 255, 255});
                             const char *label = instancia.show ? "Esconder" : "Exibir";
                             if (ImGui::SmallButton(label)) {
@@ -124,10 +126,14 @@ void GUI::makeGUI() {
                                     tempTransform = Transform{};
                                     previousModelMatrix = instancia.modelMatrix;
                                 }
-
                             }
                             ImGui::TreePop();
                             ImGui::PopStyleColor();
+                        } else {
+                            if (selectedInstance == &instancia) {
+                                selectedInstance = nullptr;
+                                instancia.showBorder = false;
+                            }
                         }
                         ImGui::PopStyleColor(1);
                     }
@@ -141,7 +147,7 @@ void GUI::makeGUI() {
         ImGui::SameLine();
 
         ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
-        ImGui::BeginChild("config", ImVec2(0, 300), true);
+        ImGui::BeginChild("config", ImVec2(0, height - 10), true);
         ImGui::Text("Configurações");
         if (editedTransform) {
 
@@ -255,13 +261,13 @@ void GUI::makeGUI() {
         ImGui::BeginChild("instances", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 0), false,
                           ImGuiWindowFlags_HorizontalScrollbar);
 
-        if (ImGui::TreeNode("instancias_keyframe","Instâncias")) {
+        if (ImGui::TreeNode("instancias_keyframe", "Instâncias")) {
             static ImGuiTextFilter filterInstances;
             filterInstances.Draw("Filtrar");
-            int counter = 0;
             for (auto &instancia: scene.models) {
                 if (!filterInstances.PassFilter(instancia.objectName.c_str()) || !instancia.show) continue;
-                if (ImGui::TreeNode("instancias2", fmt::format("{} {}", instancia.objectName, ++counter).c_str())) {
+                if (ImGui::TreeNode("instancias2",
+                                    fmt::format("{} {}", instancia.objectName, instancia.count).c_str())) {
                     selectedInstance = &instancia;
 
                 }

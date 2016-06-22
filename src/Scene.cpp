@@ -7,8 +7,7 @@
 Scene::Scene(Config &config, Camera &camera, int width, int height) : config(config), camera(camera),
                                                                       shaderLoader{config.shaderBasePath},
                                                                       width{width}, height{height},
-                                                                      floor{shaderLoader, textureLoader, camera}
-{
+                                                                      floor{shaderLoader, textureLoader, camera} {
     camera.setMouseSensitivity(config.mouseSensitivity);
     camera.setMovementSpeed(config.cameraSpeed);
 
@@ -26,6 +25,10 @@ void Scene::draw() {
 
     flashLight->setPosition(camera.getPosition());
     flashLight->setDirection(camera.getFront());
+
+    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
 
     for (auto &model: models) {
 
@@ -50,39 +53,50 @@ void Scene::draw() {
         }
         // .. AND THERE WAS LIGHT
         flashLight->applyUniforms(shader);
-        glEnable(GL_STENCIL_TEST);
-        //desenha os objetos normalmente e enche o stencil buffer
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
+
+
+        if (model.showBorder) {
+            /*
+             * eu vou evitar o máximo possível de overhead das bordas, então o código vai ficar "meio feio" com dois ifs
+             * "separados" da mesma coisa. na prática eu poderia deixar essa parte inicial e só comentar o segundo passe,
+             * mais abaixo
+             */
+            //desenha os objetos normalmente e enche o stencil buffer
+            glStencilFunc(GL_ALWAYS, 1, 0xFF);
+            glStencilMask(0xFF);
+        }
+
         shader.setMatrix4fv("model", glm::value_ptr(model.modelMatrix));
         model.model.get().draw(shader);
 
-        //esse é o segundo passe, a gente desenha o objeto um pouco maior
-        //pra usar o stencil buffer e desenhar as borda
-        //nesse ponto o stencil buffer ta ""positivo"" (1) em tudo que é desenhado
-        //então agora a gente "inverte", ou seja, tudo que for 1 não é desenhado
-        //desenhando então só a diferença de tamanho entre os objetos (a gente escala o objeto um pouco no segundo passe)
+        if (model.showBorder) {
+            //esse é o segundo passe, a gente desenha o objeto um pouco maior
+            //pra usar o stencil buffer e desenhar as borda
+            //nesse ponto o stencil buffer ta ""positivo"" (1) em tudo que é desenhado
+            //então agora a gente "inverte", ou seja, tudo que for 1 não é desenhado
+            //desenhando então só a diferença de tamanho entre os objetos (a gente escala o objeto um pouco no segundo passe)
 
-        //PS: acho que tem uma outra função (glStencilFunc) que dava pra usar, ou usar uma mascara direto. não tenho cereteza
-        // tem que testar
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glStencilMask(0x00);
-        glDisable(GL_DEPTH_TEST); // tem que desabilitar antes de desenhar o segundo passe se não da merda.
+            //PS: acho que tem uma outra função (glStencilFunc) que dava pra usar, ou usar uma mascara direto. não tenho cereteza
+            // tem que testar
+            glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+            glStencilMask(0x00);
+            glDisable(GL_DEPTH_TEST); // tem que desabilitar antes de desenhar o segundo passe se não da merda.
 
-        //segundo ""passe"" propriamente dito
-        stencilShader.enable();
+            //segundo ""passe"" propriamente dito
+            stencilShader.enable();
 
-        // tem que aplicar as mesmas transformaçoes pra deixar o bagulho no mesmo sistema de referência da camera
-        applyUniforms(camera, stencilShader);
+            // tem que aplicar as mesmas transformaçoes pra deixar o bagulho no mesmo sistema de referência da camera
+            applyUniforms(camera, stencilShader);
 
-        glm::mat4 bigModel = model.modelMatrix;
-        GLfloat scale = 1.01;
-        bigModel = glm::scale(bigModel, glm::vec3(scale, scale, scale)); // escala só um pouco
-        stencilShader.setMatrix4fv("model", glm::value_ptr(bigModel));
-        model.model.get().draw(stencilShader);
-        // terminou o segundo passe volta tudo ao normal
-        glStencilMask(0xFF);
-        glEnable(GL_DEPTH_TEST);
+            glm::mat4 bigModel = model.modelMatrix;
+            GLfloat scale = 1.05;
+            bigModel = glm::scale(bigModel, glm::vec3(scale, scale, scale)); // escala só um pouco
+            stencilShader.setMatrix4fv("model", glm::value_ptr(bigModel));
+            model.model.get().draw(stencilShader);
+            // terminou o segundo passe volta tudo ao normal
+            glStencilMask(0xFF);
+            glEnable(GL_DEPTH_TEST);
+        }
     }
     /*
      * teoricamente apenar usar um glStencilMask(0x00); deveria "desabilitar" (não deveria encher o buffer sabe?)
@@ -91,7 +105,6 @@ void Scene::draw() {
      * Ou pode ser que o certo seja, realmente, desabi porem desabilitar GL_STENCIL_TEST, porém eu não encontrei nada sobre
      * o assunto. de qualquer forma sem o glDisable abaixo nada funciona.
      */
-    glStencilMask(0x00);
     glDisable(GL_STENCIL_TEST);
 
     //o chão e as lampadas não podem encher o stencil buffer
@@ -155,7 +168,6 @@ void Scene::newModelInstance(const std::string &objectName, glm::mat4 modelMatri
     }
 
 
-
 }
 
 void Scene::setRenderLights(bool renderLights) {
@@ -206,4 +218,6 @@ void Scene::preLoadModels() {
 }
 
 ModelInstance::ModelInstance(const std::reference_wrapper<Model> &model, const std::reference_wrapper<Shader> &shader,
-                             const glm::mat4 &modelMatrix, std::string objectName) : model(model), shader(shader), modelMatrix(modelMatrix), objectName{objectName} {}
+                             const glm::mat4 &modelMatrix, std::string objectName) : model(model), shader(shader),
+                                                                                     modelMatrix(modelMatrix),
+                                                                                     objectName{objectName} {}

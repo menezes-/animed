@@ -39,10 +39,12 @@ struct ModelInstance {
      * O objeto transform abaixo serve como um placeholder para guardar modificações
      * feitas através da interface de usuário no modelMatrix do objeto.
      */
-
     Transform transform{};
 
     bool show = true;
+
+    bool showBorder = false;
+
 
     ModelInstance(const std::reference_wrapper<Model> &model, const std::reference_wrapper<Shader> &shader,
                   const glm::mat4 &modelMatrix, std::string objectName);
@@ -141,7 +143,7 @@ private:
 
     void preLoadModels();
 
-   Shader stencilShader{"shaders/model.vs.glsl","shaders/stencil_testing.fs.glsl"};
+   Shader stencilShader{"shaders/stencil_testing.vs.glsl","shaders/stencil_testing.fs.glsl"};
 
     template<class T>
     void applyUniforms(const T &obj, Shader &shader) {
