@@ -270,7 +270,7 @@ void GUI::makeGUI() {
         ImGui::Checkbox("Play", &scene.play);
         ImGui::SameLine();
         ImGui::Text(fmt::format("{} frame / {} keyframe", scene.currentFrame, scene.currentKeyFrame).c_str());
-        if(ImGui::Button("Resetar")){
+        if (ImGui::Button("Resetar")) {
             scene.currentKeyFrame = 0;
             scene.currentFrame = 0;
         }

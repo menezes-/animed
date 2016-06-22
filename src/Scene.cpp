@@ -110,14 +110,6 @@ void Scene::draw() {
 
                 interpolated.apply(model.modelMatrix);
 
-            } else {
-                if (currentKeyFrame >= numKeyframes) {
-                    currentKeyFrame = 0;
-                    model.reset();
-                } else {
-                    currentKeyFrame++;
-                }
-                currentFrame = 0;
             }
         }
 
@@ -156,7 +148,20 @@ void Scene::draw() {
     }
     if (play) {
         currentFrame++;
+        if (currentFrame >= numFrames) {
+            currentKeyFrame++;
+            if (currentKeyFrame >= numKeyframes) {
+                for (auto &model:models) {
+                    model.modelMatrix = glm::mat4{model.modelMatrixOriginal};
+                }
+                currentKeyFrame = 0;
+            }
+            currentFrame = 0;
+        }
+
+
     }
+
     /*
      * teoricamente apenar usar um glStencilMask(0x00); deveria "desabilitar" (não deveria encher o buffer sabe?)
      * o stencil pros objetos a seguir (e pra GUI também), porém, só usar o StencilMask não funciona direto
@@ -278,7 +283,7 @@ void Scene::preLoadModels() {
 
 void Scene::resetAnimation() {
 
-    for(auto& model:models){
+    for (auto &model:models) {
         model.reset();
     }
 
