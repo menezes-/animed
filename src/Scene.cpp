@@ -26,7 +26,7 @@ void Scene::draw() {
     flashLight->setPosition(camera.getPosition());
     flashLight->setDirection(camera.getFront());
 
-    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
     glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
 
@@ -91,6 +91,7 @@ void Scene::draw() {
             glm::mat4 bigModel = model.modelMatrix;
             GLfloat scale = 1.05;
             bigModel = glm::scale(bigModel, glm::vec3(scale, scale, scale)); // escala só um pouco
+            bigModel = glm::translate(bigModel, glm::vec3(0.0f, -.5f, 0.0f)); // escala só um pouco
             stencilShader.setMatrix4fv("model", glm::value_ptr(bigModel));
             model.model.get().draw(stencilShader);
             // terminou o segundo passe volta tudo ao normal
